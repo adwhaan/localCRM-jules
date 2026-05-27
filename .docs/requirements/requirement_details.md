@@ -1,6 +1,6 @@
-# 📜 Requirement Specification Details (MyCRM)
+# 📜 Requirement Specification Details (LocalCRM)
 
-*This document outlines all mandatory functional and non-functional requirements for the MyCRM application. Agents should treat these points as definitive implementation constraints.*
+*This document outlines all mandatory functional and non-functional requirements for the LocalCRM application. Agents should treat these points as definitive implementation constraints.*
 
 ---
 

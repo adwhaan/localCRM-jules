@@ -1,4 +1,4 @@
-# 📚 Data Model Specification (MyCRM)
+# 📚 Data Model Specification (localCRM)
 
 *This document defines the explicit schema, data types, primary keys (PK), foreign keys (FK), and constraints for all database tables. This version incorporates clarified modeling decisions and should be treated as the single source of truth for the database layer.*
 
@@ -298,6 +298,34 @@ This table is append-only. Audit log rows must never be updated or deleted by no
 | `performed_by` | TEXT | NOT NULL | Username of acting user or `system`. |
 | `notes` | TEXT | NULL | Optional descriptive text. |
 
+## Additional Security Support Entities
+
+### Entity: `refresh_tokens`
+
+Stores server-side refresh token sessions for revocation, rotation, and reuse detection.
+
+| Field Name | Data Type | Constraints | Notes |
+| :--- | :--- | :--- | :--- |
+| `refresh_token_id` | INTEGER | PK, Auto-Increment | |
+| `user_id` | INTEGER | FK to `users.user_id`, NOT NULL | |
+| `session_id` | TEXT | NOT NULL | Stable session-family identifier; corresponds to JWT `sid`. |
+| `token_hash` | TEXT | NOT NULL | Hash of refresh token value. |
+| `issued_at` | TIMESTAMP | NOT NULL | |
+| `expires_at` | TIMESTAMP | NOT NULL | |
+| `revoked_at` | TIMESTAMP | NULL | |
+| `replaced_by_token_id` | INTEGER | NULL, FK to `refresh_tokens.refresh_token_id` | Rotation chain support. |
+| `reuse_detected_at` | TIMESTAMP | NULL | Token reuse detection marker. |
+| `created_by_ip` | TEXT | NULL | Optional source IP. |
+| `user_agent` | TEXT | NULL | Optional client descriptor. |
+
+### Add fields to `users`
+
+| Field Name | Data Type | Constraints | Notes |
+| :--- | :--- | :--- | :--- |
+| `must_change_password` | BOOLEAN | NOT NULL, Default `FALSE` | Required password change before normal login. |
+| `failed_login_attempts` | INTEGER | NOT NULL, Default `0` | Optional user-level lockout support. |
+| `locked_until` | TIMESTAMP | NULL | Temporary lockout end time. |
+
 ---
 
 ## 🔗 IV. Relationship (Link) Tables
@@ -513,3 +541,4 @@ Defines role access rights. This table is system configuration and is not soft-d
 5.  **Interaction Context Rule:** `interactions_link` is the canonical contextual association record for linking an interaction to a contact, company, and/or engagement according to the defined exclusivity rules.
 6.  **Lookup Rule:** UI forms and backend validation must use the defined `tag_group` vocabularies for controlled text fields.
 7.  **Tag Rule:** Delimited freeform tag fields are supported on `companies`, `contacts`, `interactions`, and `engagements`, using values from the `entity_tags` group.
+

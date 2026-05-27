@@ -1,4 +1,4 @@
-# MyCRM Working Memory
+# LocalCRM Working Memory
 
 This file captures resolved decisions from the interactive clarification process so far.
 
@@ -628,3 +628,221 @@ This file captures resolved decisions from the interactive clarification process
 
 ### Documentation
 - The spec should include a normative GraphQL operation catalog.
+
+## 8. Authentication / JWT / session lifecycle decisions
+
+### Token lifetimes
+- Access token lifetime is configurable via settings key:
+  - `token_lifetime`
+- Refresh token lifetime is configurable via settings key:
+  - `refresh_token_lifetime`
+
+### Refresh token behavior
+- Refresh tokens use rotation.
+- Reuse of a previously rotated refresh token triggers token reuse detection and revokes the session/token family.
+- Multiple concurrent refresh-token sessions per user are allowed.
+- No individual-session revocation UI/API; only revoke-all-sessions per user.
+
+### Session revocation
+- Current user can revoke all own sessions.
+- Admin can revoke all sessions for another user.
+- Admin revoke-user-sessions requires dedicated permission:
+  - `users.revoke_sessions`
+
+### JWT claims
+- Access token includes at minimum:
+  - `sub`
+  - `name`
+  - `role`
+  - `permissions`
+  - `exp`
+  - `sid`
+  - `preferred_username`
+- `sub` represents `user_id`.
+- Effective permissions are included directly in the token.
+
+### Permission/security invalidation
+- Role/permission changes force session invalidation.
+- Password change revokes all existing sessions.
+- Admin password reset revokes all existing sessions for the target user.
+
+### JWT validation config
+- JWT validation includes issuer and audience checks.
+- Settings keys:
+  - `jwt_issuer`
+  - `jwt_audience`
+- JWT signing key/secret comes from environment/host configuration, not app settings.
+
+### Current user/session endpoint
+- Expose:
+  - REST: `GET /api/auth/me`
+  - GraphQL: `me`
+- `me` includes:
+  - username
+  - role
+  - effective permissions
+
+### Auth response shapes
+- Login returns:
+  - access token
+  - refresh token
+  - current user payload
+- Refresh returns:
+  - new access token
+  - new refresh token
+  - refreshed current user payload
+- Logout invalidates current session only.
+
+### Revoke-all endpoints
+- Current user:
+  - REST: `POST /api/auth/revoke-all-sessions`
+  - GraphQL: `revokeAllMySessions`
+- Admin:
+  - REST: `POST /api/users/{id}/revoke-sessions`
+  - GraphQL: `revokeUserSessions(id: Int!)`
+
+### Documentation
+- Authentication/session rules should be documented as a normative auth contract.
+
+## 9. Dashboard metric definition decisions
+
+### Tasks card
+- “Top 5 upcoming tasks” means:
+  - `is_task = TRUE`
+  - not deleted
+  - state not terminal/closed
+  - ordered by earliest future `interaction_date`, then `interaction_time`
+- Terminal/closed interaction states are configured from settings key:
+  - `interaction_closed_states`
+- For same-day tasks with null `interaction_time`:
+  - sort after timed tasks on that day
+  - before tasks on later days
+
+### Companies card
+- Show both:
+  - last created company
+  - last updated company
+- Industry segmentation is by:
+  - `branch` using `company_branch`
+- Size segmentation is by:
+  - `size` using `company_size`
+- “Interaction count per Company Industry” includes:
+  - interactions linked directly to companies
+  - interactions linked via contacts, deriving active company at interaction date
+  - grouped by resolved company `branch`
+- If company cannot be resolved for a contact-linked interaction:
+  - exclude from this metric
+
+### Contacts card
+- Show both:
+  - last created contact
+  - last updated contact
+- Total contact count excludes soft-deleted rows and respects permission filtering.
+- Contact role segmentation is based on:
+  - current active role from `company_contacts_link`
+- If a contact has multiple active roles:
+  - count once in each active role bucket
+- “Interaction count per Contact Role” means:
+  - interactions linked to contacts
+  - grouped by contact’s active role at interaction date
+- If role at interaction date cannot be resolved:
+  - place in `Unknown/Unresolved` bucket
+
+### Interactions card
+- Total interaction count excludes tasks.
+- Top 5 interaction types excludes tasks.
+
+### Engagements card
+- Total engagement count excludes soft-deleted rows and respects permission filtering.
+- Open vs Closed engagement counts use configured closed statuses from settings key:
+  - `engagement_closed_statuses`
+- “Top 3 currently open engagements” are ranked by:
+  - most recent associated interaction
+- Open engagements with no associated interactions:
+  - are included
+  - sort after those with interactions
+- Last interaction summary includes:
+  - interaction date/time
+  - subject
+  - type
+
+### System metrics
+- “Last API action” means:
+  - last successful write action only
+- It includes:
+  - entity name
+  - entity id
+  - action type
+- “Total API call failures since startup” includes:
+  - 5xx/system failures
+  - auth failures
+  - authorization failures
+- “Total API calls made since startup” counts:
+  - raw HTTP requests only
+- “Total database size” means:
+  - DB file + WAL/journal files when feasible
+  - fallback to logical-size estimation if not feasible
+- “Running time / uptime” means:
+  - process uptime since current app start
+
+### Documentation
+- Dashboard metric definitions should be documented as a normative contract.
+
+## 10. User-management and password-policy decisions
+
+### User creation
+- Newly created users are active immediately by default.
+- A user must have exactly one primary role at creation time.
+- Admin sets the initial password directly.
+
+### Username rules
+- Usernames are case-insensitive for login and uniqueness.
+- Usernames cannot be changed after creation.
+
+### Forced password change
+- Admin-created users must change password on first login.
+- Admin password reset also forces change password on next login.
+- Do not expose a `mustChangePassword` boolean in normal auth success responses.
+- If password change is required, login is refused with error code:
+  - `password_change_required`
+- Provide dedicated forced-password-change operations:
+  - REST: `POST /api/auth/complete-password-change`
+  - GraphQL: `completePasswordChange`
+- Forced password change uses a short-lived password-change token returned by the refused login flow.
+- Password-change token lifetime is configurable via:
+  - `password_change_token_lifetime`
+
+### User visibility and filtering
+- Disabled users remain visible in normal admin user lists.
+- User list APIs support filtering by:
+  - `is_active`
+  - `role_id`
+  - `username`
+- Non-admin users may only access their identity through:
+  - `me`
+  not generic user endpoints.
+
+### Role changes
+- Admins may change a user's role through normal user update operations.
+- Changing a user's role triggers session invalidation.
+
+### Password policy
+- Password policy is explicitly defined.
+- Minimum password length is configurable via:
+  - `min_password_length`
+- Password policy is length-only, no character-class diversity requirement.
+- Reuse of the current password is forbidden.
+- No password history beyond current password.
+
+### Login lockout
+- Repeated failed login attempts trigger temporary account lockout.
+- Lockout policy is configurable.
+- Settings keys:
+  - `max_failed_login_attempts`
+  - `login_lockout_duration`
+- Lockout is tracked separately by:
+  - username
+  - source IP
+
+### Documentation
+- These rules should be documented as a normative user-management contract.

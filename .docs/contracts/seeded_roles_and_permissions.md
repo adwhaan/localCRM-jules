@@ -1,6 +1,6 @@
-# 👥 Seeded Roles and Permission Matrix (MyCRM)
+# 👥 Seeded Roles and Permission Matrix (LocalCRM)
 
-*This document defines the normative default seeded roles and permission assignments for MyCRM. These defaults are applied during initialization and may later be adjusted through authorized administration where allowed.*
+*This document defines the normative default seeded roles and permission assignments for LocalCRM. These defaults are applied during initialization and may later be adjusted through authorized administration where allowed.*
 
 ---
 

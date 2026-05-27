@@ -1,13 +1,13 @@
-# 🔐 RBAC and API Clarifications (MyCRM)
+# 🔐 RBAC and API Clarifications (LocalCRM)
 
-*This document captures the resolved authorization and API contract decisions for MyCRM. It supersedes contradictory or ambiguous statements in earlier specifications where applicable.*
+*This document captures the resolved authorization and API contract decisions for LocalCRM. It supersedes contradictory or ambiguous statements in earlier specifications where applicable.*
 
 ---
 
 # I. RBAC / Authorization Model
 
 ## 1. Authorization Model Overview
-MyCRM uses a **hybrid RBAC model**:
+LocalCRM uses a **hybrid RBAC model**:
 - **Entity-action permissions** for normal business entities
 - **Coarse system permissions** for cross-cutting administrative capabilities
 
@@ -188,7 +188,7 @@ Ordinary validation failures are **not** audit logged unless they also qualify a
 # III. API Contract Clarifications
 
 ## 1. API Style
-MyCRM supports both:
+LocalCRM supports both:
 - **GraphQL**
 - **REST**
 

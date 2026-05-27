@@ -1,112 +1,333 @@
-# 🏗️ Application Architecture Design Specification (MyCRM)
+# 🏗️ Application Architecture Design Specification (Canonical)
 
-*This document defines the system's architectural boundaries, technical guidelines, and API contracts. Coding agents must treat this as the primary blueprint for the entire codebase.*
+## 📜 I. Global Architectural Principles
 
-## 📜 I. Global Architectural Guidelines (Compliance Checklist)
+All code generated for backend and frontend must adhere to:
 
-All code generated for both frontend and backend must strictly adhere to these non-negotiable principles.
+- OWASP-aligned secure design
+- uniform error contracts
+- separation of API layer and business/service layer
+- strong validation and transactional integrity
+- optimistic concurrency via `updated_at`
+- auditability of writes and security-relevant failures
+- soft-delete semantics by default
+- SQLite as default local store
+- migration tracking through `__migrations`
 
-### ✅ General Principles (Best Practices)
-*   **Security:** Strict compliance with OWASP Top 10 guidelines (Injection Prevention, XSS prevention, secure session management, etc.).
-*   **Error Handling:** All API functions must include comprehensive try-catch blocks, ensuring graceful failure and clear error payloads (e.g., 400 Bad Request, 401 Unauthorized, 403 Forbidden) using uniform contracts like
+---
+
+## 🛡️ II. Data Integrity and Safety
+
+### 1. Validation
+Backend validation is mandatory for:
+- required fields
+- type correctness
+- format constraints
+- business rule constraints
+- permission checks
+
+### 2. Concurrency
+Optimistic concurrency uses `updated_at`.
+
+Rules:
+- client must send `updated_at` for update operations
+- REST mismatch returns `409 Conflict`
+- GraphQL mismatch returns application error code `concurrency_conflict`
+
+### 3. Transactionality
+Any business action modifying multiple related records must be transactional.
+
+Examples:
+- interaction create + contextual link create + audit log
+- link add/remove + audit log
+- restore + audit log
+- user role change + session invalidation
+
+### 4. Audit Logging
+Audit logging is required for:
+- entity create/update/delete/restore
+- link add/remove
+- failed login attempts
+- authorization failures
+- API/system errors
+
+Ordinary validation failures are not audited by default.
+
+---
+
+## ⚙️ III. API Architecture
+
+## 1. API Standard
+The backend exposes both:
+
+- **GraphQL**
+- **REST**
+
+Both are first-class APIs.
+
+### GraphQL supports:
+- reads
+- writes
+- restore
+- bulk operations
+- auth/session operations
+- administrative operations
+- dashboard and metrics queries
+
+### REST supports:
+- reads
+- writes
+- soft-delete via `DELETE`
+- restore via action endpoints
+- bulk operations
+- export operations
+- dashboard and system metrics endpoints
+- auth/session endpoints
+
+The frontend may use either API style per use case.
+
+---
+
+## 2. REST Conventions
+
+### Base Patterns
+- `/api/{entity}`
+- `/api/{entity}/{id}`
+
+### Common operations
+- `GET /api/{entity}`
+- `GET /api/{entity}/{id}`
+- `POST /api/{entity}`
+- `PUT /api/{entity}/{id}`
+- `PATCH /api/{entity}/{id}`
+- `DELETE /api/{entity}/{id}`
+- `POST /api/{entity}/{id}/restore`
+
+### Search
+- `POST /api/{entity}/search`
+
+### Deleted records
+- `GET /api/{entity}/deleted`
+
+### Bulk operations
+- `POST /api/{entity}/bulk-delete`
+- `POST /api/{entity}/bulk-restore`
+
+### Export
+- `POST /api/{entity}/export`
+
+### Dashboard/system
+- `GET /api/dashboard`
+- `GET /api/system/metrics`
+
+### Auth
+- `POST /api/auth/login`
+- `POST /api/auth/refresh`
+- `POST /api/auth/logout`
+- `POST /api/auth/change-password`
+- `POST /api/auth/complete-password-change`
+- `POST /api/auth/revoke-all-sessions`
+- `GET /api/auth/me`
+
+### Users
+- `GET /api/users`
+- `GET /api/users/{id}`
+- `POST /api/users`
+- `PUT /api/users/{id}`
+- `PATCH /api/users/{id}`
+- `POST /api/users/{id}/reset-password`
+- `POST /api/users/{id}/disable`
+- `POST /api/users/{id}/enable`
+- `POST /api/users/{id}/revoke-sessions`
+
+---
+
+## 3. GraphQL Conventions
+
+### Endpoint
+- `/graphql`
+
+### Naming
+- type names: singular PascalCase
+- collection queries: plural camelCase
+- single-item queries: singular camelCase
+- mutations: `verbEntity`
+
+### Pagination
+Offset pagination with:
+- `items`
+- `totalCount`
+- `offset`
+- `limit`
+
+### Filters and Sorting
+Each entity has typed filter/sort inputs.
+
+### Deleted data
+Deleted data is exposed through separate queries such as:
+- `deletedCompanies`
+- `deletedContacts`
+
+### Mutations
+Create/update return full entity objects.  
+Delete/restore return shared `MutationResult`.
+
+---
+
+## 💻 IV. Backend Component Model
+
+## 1. Layers
+- API Layer
+  - REST controllers
+  - GraphQL resolvers
+- Application Layer
+  - services
+  - authorization
+  - audit logging
+  - session management
+- Data Access Layer
+  - EF Core for writes / transactions
+  - Dapper optionally for read-heavy queries
+- Infrastructure Layer
+  - SQLite
+  - migrations
+  - JWT signing and validation
+  - config providers
+
+## 2. Required Services
+- `AuditService`
+- `AuthService`
+- `RefreshTokenService`
+- `PermissionService`
+- `DashboardService`
+- `ExportService`
+- entity-specific CRUD services
+- link management services
+
+---
+
+## 🌐 V. Frontend Architecture
+
+The frontend is a SPA and must:
+- manage auth and refresh lifecycle
+- enforce route and UI guarding
+- honor forced-password-change flow
+- support dashboard/list/detail/edit views
+- use server-side filtering/sorting semantics
+- render controls conditionally based on permissions
+- support explicit private-visibility elevation mode where permitted
+
+The UI may be implemented in:
+- Angular
+- Blazor WebAssembly
+
+Feature parity expectations should be project-planned explicitly.
+
+---
+
+## 🧾 VI. Error Contract
+
+### REST
+Errors must use:
 ```json
 {
   "code": "validation_failed",
   "message": "Validation failed",
-  "details": {
-    "email": ["Invalid email format"]
-  },
+  "details": {},
   "traceId": "..."
 }
-```
-*   **Design Patterns:** Use established design patterns (e.g., Repository Pattern, Unit of Work, Service Layer pattern) to maximize modularity and testability.
-*   **Code Quality:** Code must be production-grade, highly performant, and extensively commented.
 
-### 🛡️ Data Integrity and Safety
-*   **Data Validation:** Backend must perform all validation (type checking, required fields, length constraints) before processing any data. No invalid data is permitted into the data store.
-*   **Concurrency:** The backend service must be multi-user and multi-threaded safe to prevent deadlocks or race conditions during concurrent writes.
-*   **Transactionality:** Any business action that modifies data across multiple entities (e.g., creating an Interaction which also updates a Company's last activity) MUST be wrapped in a database transaction (ACID compliance).
-*   **Data Store Requirement:** The backend must support native data store integration (no external data store installation required for basic operation).
+### GraphQL
+Application errors must populate extensions with:
 
-### ⚙️ Backend Operational Constraints
-*   **Architecture:** Implement a clear separation between the API Layer (public interface) and the Business Logic/Model Layer (internal reusable parts).
-*   **Audit Logging:**
-    *   The `audit_logs` table is **WRITE-ONLY** for the backend.
-    *   The log must capture *all* data modification intent and *all* API errors (including the error message and user/system context).
-    *   Audit logs are immutable and cannot be modified or deleted.
-    *   Administrator can query the log.
-*   **Authentication:**
-    *   All passwords MUST be stored as secure hashes (e.g., bcrypt).
-    *   The initial Administrator user must be created via a dedicated command-line initialization process:
-        - `--init`: Initializes the database schema and seeds basic roles.
-        - `--admin-password [password]`: Sets the password for the default `admin` user during initialization.
-*   **Database Setup:** Use SQL migration scripts run at application startup. Migration tracking must be handled via a dedicated `__migrations` table.
+* `code`
+* `message`
+* `details`
+* `traceId`
 
-## 💻 II. Backend Architecture (The API Contract)
+---
 
-### 🎯 API Standard
-The backend API follows a hybrid approach:
-- **GraphQL:** Used for all operations (lists, details, and complex queries). This allows clients (frontends) to request exactly the data they need, optimizing payload size and improving flexibility. We use **HotChocolate** for the GraphQL implementation. Pagination will be supported using offsets.
-- **REST:** Provided for **all** operations (CRUD). REST endpoints allow for better/easier caching and provide a traditional interface for simpler interactions.
+# `requirements/requirement_details.md`
 
-**Note** that although `Tasks` is a special variant of `Interactions`, it still gets its own API endpoint. The backend API will ensure that all requests to this endpoint will include the filter `is_task` = TRUE.
+```md
+# 📜 Requirement Specification Details (Canonical)
 
-### 🔑 Core API Functions
-The API must expose a dedicated set of service endpoints structured around the main entities.
+## 🎯 I. Functional Requirements
 
-1.  **User/Authentication:** Dedicated endpoints for login, registration, and user management (Admin Scope). Authentication will be done using JWT Bearer tokens and token expiry.
-2.  **Resource CRUD:** Standard GraphQL for Read for all primary entities, and REST for Create, Read, Update, Delete, and Restore for all entities. Standard endpoint format, including filtering parameters.
-3.  **Relationship Management:** Dedicated resolvers/mutations for linking and unlinking entities (e.g., `companies_contacts_link`).
+### FR-1 Authentication and User Management
+1. Username/password authentication is required.
+2. JWT access tokens and refresh tokens are required.
+3. Forced-password-change flow is required for:
+   - admin-created users on first login
+   - admin-reset users on next login
+4. Multi-user support is required.
+5. User management, role assignment, password reset, enable/disable, and revoke-sessions support are required.
+6. RBAC is mandatory.
 
-### 📝 Generic CRUD Schema Template (GraphQL Type)
-Due to the consistent pattern across all major entities (`companies`, `contacts`, `interactions`, etc.), a single, reusable schema template is defined below.
+### FR-2 Core Entity Management
+The system must support:
+- Companies
+- Contacts
+- Interactions
+- Documents
+- Tasks (as `interactions.is_task = TRUE`)
+- Engagements
+- Users
+- Roles/Permissions
+- Notes
+- Tags
+- Settings
+- AuditLog
 
-**GraphQL Object Type Structure:**
-Every core entity type (e.g., `Company`, `Contact`) will expose the following fields:
-*   `id`: ID (Integer) - Primary Key
-*   `name`: Text - Primary Display Name
-*   `ref`: Text - Shorthand reference name (if applicable)
-*   `isDeleted`: Boolean - Soft-delete flag.
-*   `createdAt`: DateTime
-*   `createdBy`: String (User Identifier)
-*   `updatedAt`: DateTime
-*   `updatedBy`: String (User Identifier)
-*   *(... plus all entity-specific fields defined in data_dictionary.md)*
+### FR-3 Supporting Data and Settings
+1. Tags are supported as:
+   - structured lookup values via `tags`
+   - delimited entity tag fields on selected business entities
+2. Settings are supported as global configuration values.
+3. Dashboard/system metrics use settings for configurable semantics where specified.
 
-**GraphQL Mutation/Query Template:**
-| Action | HTTP Method (GraphQL equivalent) | Scope | Description |
-| :--- | :--- | :--- | :--- |
-| **List/Read All** | `query` | Authorized/Admin | Retrieves a paginated list of entities. Must respect `is_deleted=FALSE` by default. |
-| **Read Specific** | `query` | Authorized/Admin | Retrieves a single entity by ID. |
-| **Create** | `mutation` | Authorized | Creates a new record, triggers initial audit log entry. |
-| **Update** | `mutation` | Authorized | Modifies an existing record, triggers audit log entry. |
-| **Soft-Delete** | `mutation` | Authorized | Sets the `is_deleted` flag and records the action in the `audit_logs`. |
-| **Restore** | `mutation` | Admin Only | Reverts the `is_deleted` flag (sets to `FALSE`) and records a `RESTORE` action in the audit log. |
+---
 
-### 💡 Critical Transaction Logic Examples
-The backend must implement specific transactional logic for complex workflows:
+## 🚨 II. Non-Functional Constraints
 
-1.  **Interaction Creation (UC03):** When creating an `Interaction`, the service layer must:
-    *   (A) Read the specified Contact.
-    *   (B) Determine the contact's active company at the recorded date/time.
-    *   (C) If (B) is successful, automatically set the `company_id` foreign key.
-    *   (D) Log the creation transaction and the data state to the `audit_logs`.
+### NFR-1 Persistence and Auditing
+- Soft-delete is required for business entities and soft-deletable link tables.
+- Standard public reads exclude deleted data by default.
+- Restore support is required.
+- Audit logging is mandatory for write operations and security-relevant failures.
+- Audit logs are append-only.
 
-2.  **Link Management:** Creating or deleting a link record (e.g., `company_contacts_link`) must trigger both the link table update and an immediate audit log entry for the relationship change (`LINK_ADD`/`LINK_REMOVE`).
+### NFR-2 Security
+- Passwords must be stored as secure hashes.
+- Access token and refresh token flows are required.
+- Refresh tokens are server-side stored and revocable.
+- Session invalidation is required on:
+  - role/permission changes
+  - password changes
+  - admin password reset
+  - user disable
+  - token reuse detection
 
-## 🎨 III. Frontend Architecture (The Client)
+### NFR-3 Concurrency
+- Optimistic concurrency via `updated_at`
+- first-to-save wins
+- conflict must be surfaced to clients explicitly
 
-### 🖥️ Design Goal
-The frontend's sole responsibility is presenting the data and handling user interaction; it must never perform complex business logic or directly interact with the database. All data mutations must be routed through the authenticated GraphQL or REST API endpoints.
+### NFR-4 Dashboard Semantics
+- Dashboard metric definitions are governed by the dashboard metrics contract.
+- System metrics and business metrics are separate authorization scopes.
 
-### 🧩 Required Components and Views
-The Single Page Application (SPA) must be structured using the following modular components:
+---
 
-1.  **Dashboard View:** The primary landing page, utilizing a card-like layout to display key metrics and recent activities. Must handle asynchronous data loading for all dashboard components.
-2.  **Entity List View:** A generalized, reusable component responsible for displaying a paginated list of records. Must contain comprehensive filtering, sorting, and search capabilities.
-3.  **Entity Detail/Edit View:** The comprehensive form component for creating or editing an entity. Must dynamically render input fields based on the entity type and its allowed reference/linking groups.
-4.  **Read-Only View:** Used for dedicated detail viewing, particularly for non-editable data like the Audit Log.
+## 🧩 III. Seeded Defaults
+Initialization must seed at minimum:
+- roles:
+  - `Administrator`
+  - `User`
+- default permission catalog
+- role-permission assignments
+- required tag groups
+- required settings keys as appropriate
 
-### 🌐 Technology Split
-*   **Frontend Frameworks:** Support for two frameworks (Blazor and Angular) is required. The data fetching and component logic must be strictly decoupled from the UI framework implementation.
-*   **API Consumption:** The frontend must manage the user authentication flow (Login $\rightarrow$ Token acquisition) and attach the resulting authorization token to *every* subsequent API call.
+The seeded `Administrator` role receives all permissions by default.  
+The seeded `User` role receives the baseline permissions defined in `seeded_roles_and_permissions.md`.

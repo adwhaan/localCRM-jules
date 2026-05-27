@@ -1,6 +1,6 @@
-# 🌐 GraphQL Operation Catalog (MyCRM)
+# 🌐 GraphQL Operation Catalog (LocalCRM)
 
-*This document defines the normative GraphQL endpoint, naming conventions, query patterns, and mutation catalog for MyCRM.*
+*This document defines the normative GraphQL endpoint, naming conventions, query patterns, and mutation catalog for LocalCRM.*
 
 ---
 
@@ -319,3 +319,11 @@ GraphQL errors must include standardized application metadata in extensions wher
 * message
 * details
 * traceId
+
+## Additional Auth/User Operations
+
+### Forced Password Change
+- `completePasswordChange(input: CompletePasswordChangeInput!): MutationResult!`
+
+### Current User
+- `me: CurrentUser!`

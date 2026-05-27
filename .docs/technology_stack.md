@@ -1,4 +1,4 @@
-# 🛠️ Technology Stack Specification (MyCRM)
+# 🛠️ Technology Stack Specification (LocalCRM)
 
 *This document specifies all mandated technologies, frameworks, and libraries. Agents must install and utilize these dependencies to ensure system consistency.*
 
