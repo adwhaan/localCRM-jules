@@ -1,3 +1,13 @@
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.db
+*.log
+*.txt
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode,rider,webstorm+all,angular,node,dotnetcore
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,visualstudiocode,rider,webstorm+all,angular,node,dotnetcore
 
