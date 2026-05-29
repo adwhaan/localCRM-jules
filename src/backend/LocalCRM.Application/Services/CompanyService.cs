@@ -73,11 +73,34 @@ namespace LocalCRM.Application.Services
 
         public async Task<bool> RestoreAsync(int id, string username)
         {
-            // Requires custom query to include deleted
-            return false; // TODO: Implement restore via repo query
+            var item = await _repo.GetByIdAsync(id);
+            if (item == null || !item.IsDeleted) return false;
+            item.IsDeleted = false;
+            item.DeletedAt = null;
+            item.UpdatedBy = username;
+            await _repo.SaveChangesAsync();
+            await _auditService.LogAsync("companies", id, ActionTypes.Restore, null, username);
+            return true;
         }
 
-        public Task<int> BulkDeleteAsync(IEnumerable<int> ids, string username) => Task.FromResult(0);
-        public Task<int> BulkRestoreAsync(IEnumerable<int> ids, string username) => Task.FromResult(0);
+        public async Task<int> BulkDeleteAsync(IEnumerable<int> ids, string username)
+        {
+            int count = 0;
+            foreach (var id in ids)
+            {
+                if (await DeleteAsync(id, username)) count++;
+            }
+            return count;
+        }
+
+        public async Task<int> BulkRestoreAsync(IEnumerable<int> ids, string username)
+        {
+            int count = 0;
+            foreach (var id in ids)
+            {
+                if (await RestoreAsync(id, username)) count++;
+            }
+            return count;
+        }
     }
 }
