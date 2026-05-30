@@ -1,0 +1,61 @@
+Using project '/app/src/backend/LocalCRM.Infrastructure/LocalCRM.Infrastructure.csproj'.
+Using startup project '/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj'.
+dotnet msbuild /getProperty:ProjectName /getProperty:AssemblyName /getProperty:DesignAssembly /getProperty:Language /getProperty:OutputPath /getProperty:PlatformTarget /getProperty:ProjectAssetsFile /getProperty:ProjectDir /getProperty:RootNamespace /getProperty:RuntimeFrameworkVersion /getProperty:TargetFileName /getProperty:TargetFrameworkMoniker /getProperty:Nullable /getProperty:TargetFramework /getProperty:TargetPlatformIdentifier /getProperty:Platform /t:ResolvePackageAssets /getItem:RuntimeCopyLocalItems /app/src/backend/LocalCRM.Infrastructure/LocalCRM.Infrastructure.csproj
+dotnet msbuild /getProperty:ProjectName /getProperty:AssemblyName /getProperty:DesignAssembly /getProperty:Language /getProperty:OutputPath /getProperty:PlatformTarget /getProperty:ProjectAssetsFile /getProperty:ProjectDir /getProperty:RootNamespace /getProperty:RuntimeFrameworkVersion /getProperty:TargetFileName /getProperty:TargetFrameworkMoniker /getProperty:Nullable /getProperty:TargetFramework /getProperty:TargetPlatformIdentifier /getProperty:Platform /t:ResolvePackageAssets /getItem:RuntimeCopyLocalItems /app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj
+Build started...
+dotnet build /app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj /verbosity:quiet /nologo /p:PublishAot=false
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(16,14): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(31,66): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(44,67): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(60,14): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(75,66): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(88,67): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(16,50): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(21,57): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(27,49): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(32,56): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(38,57): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(43,55): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(48,43): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(53,51): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(58,47): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(63,49): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(68,51): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(77,33): error CS0841: Cannot use local variable 'contact' before it is declared [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+
+Build FAILED.
+
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 12.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(16,14): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(31,66): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(44,67): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(60,14): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(75,66): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(88,67): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(16,50): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(21,57): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(27,49): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(32,56): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(38,57): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(43,55): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(48,43): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(53,51): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(58,47): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(63,49): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Queries/Query.cs(68,51): warning CS0618: 'ScopedServiceAttribute' is obsolete: 'Use [Service(ServiceKind.Pooled)] or [Service(ServiceKind.Resolver)]' [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+/app/src/backend/LocalCRM.WebApi/GraphQL/Mutations/Mutation.cs(77,33): error CS0841: Cannot use local variable 'contact' before it is declared [/app/src/backend/LocalCRM.WebApi/LocalCRM.WebApi.csproj]
+    19 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.90
+
+Microsoft.EntityFrameworkCore.Tools.CommandException: Build failed. Use dotnet build to see the errors.
+   at Microsoft.EntityFrameworkCore.Tools.Project.Build(IEnumerable`1 additionalArgs)
+   at Microsoft.EntityFrameworkCore.Tools.RootCommand.Execute(String[] _)
+   at Microsoft.EntityFrameworkCore.Tools.Commands.CommandBase.<>c__DisplayClass0_0.<Configure>b__0(String[] args)
+   at Microsoft.DotNet.Cli.CommandLine.CommandLineApplication.Execute(String[] args)
+   at Microsoft.EntityFrameworkCore.Tools.Program.Main(String[] args)
+Build failed. Use dotnet build to see the errors.

@@ -1,0 +1,37 @@
+@page "/audit-logs"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Services
+@inject ApiService Api
+
+<PageTitle>Audit Logs</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Audit Logs</MudText>
+
+@if (items == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="@items" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Time</MudTh>
+            <MudTh>User</MudTh>
+            <MudTh>Action</MudTh>
+            <MudTh>Entity</MudTh>
+            <MudTh>Notes</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Time">@context.PerformedAt.ToString("G")</MudTd>
+            <MudTd DataLabel="User">@context.Username</MudTd>
+            <MudTd DataLabel="Action">@context.Action</MudTd>
+            <MudTd DataLabel="Entity">@context.EntityName (@context.EntityId)</MudTd>
+            <MudTd DataLabel="Notes">@context.Notes</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<AuditLogDto>? items;
+    protected override async Task OnInitializedAsync() => items = await Api.GetAuditLogsAsync();
+}

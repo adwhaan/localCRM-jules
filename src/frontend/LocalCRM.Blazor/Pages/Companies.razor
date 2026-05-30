@@ -1,0 +1,38 @@
+@page "/companies"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Services
+@inject ApiService Api
+@inject NavigationManager Navigation
+
+<PageTitle>Companies</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Companies</MudText>
+
+@if (companies == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="@companies" Hover="true" Breakpoint="Breakpoint.Sm" OnRowClick="@((e) => Navigation.NavigateTo($"/companies/{((CompanyDto)e.Item).CompanyId}"))">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>City</MudTh>
+            <MudTh>Website</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="City">@context.City</MudTd>
+            <MudTd DataLabel="Website">@context.Website</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<CompanyDto>? companies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        companies = await Api.GetCompaniesAsync();
+    }
+}
