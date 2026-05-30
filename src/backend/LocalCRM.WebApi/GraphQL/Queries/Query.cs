@@ -3,6 +3,7 @@ using LocalCRM.Application.Interfaces;
 using HotChocolate;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LocalCRM.WebApi.GraphQL.Queries
@@ -10,12 +11,15 @@ namespace LocalCRM.WebApi.GraphQL.Queries
     public class Query
     {
         public async Task<IEnumerable<CompanyDto>> GetCompanies([Service] ICompanyService s) => await s.GetAllAsync();
+        public async Task<IEnumerable<CompanyDto>> GetDeletedCompanies([Service] ICompanyService s) => await s.GetDeletedAsync();
         public async Task<CompanyDto?> GetCompany(int id, [Service] ICompanyService s) => await s.GetByIdAsync(id);
 
         public async Task<IEnumerable<ContactDto>> GetContacts([Service] IContactService s) => await s.GetAllAsync();
+        public async Task<IEnumerable<ContactDto>> GetDeletedContacts([Service] IContactService s) => await s.GetDeletedAsync();
         public async Task<ContactDto?> GetContact(int id, [Service] IContactService s) => await s.GetByIdAsync(id);
 
         public async Task<IEnumerable<InteractionDto>> GetInteractions([Service] IInteractionService s) => await s.GetAllAsync();
+        public async Task<IEnumerable<InteractionDto>> GetDeletedInteractions([Service] IInteractionService s) => await s.GetDeletedAsync();
         public async Task<InteractionDto?> GetInteraction(int id, [Service] IInteractionService s) => await s.GetByIdAsync(id);
 
         public async Task<IEnumerable<EngagementDto>> GetEngagements([Service] IEngagementService s) => await s.GetAllAsync();

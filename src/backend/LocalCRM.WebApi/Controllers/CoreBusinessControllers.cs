@@ -27,6 +27,13 @@ namespace LocalCRM.WebApi.Controllers
             return Ok(results);
         }
 
+        [HttpGet("deleted")]
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetDeleted()
+        {
+            var results = await _companyService.GetDeletedAsync();
+            return Ok(results);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<CompanyDto>> GetById(int id)
         {
@@ -68,6 +75,27 @@ namespace LocalCRM.WebApi.Controllers
             if (!success) return NotFound();
             return Ok();
         }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> Search([FromQuery] string q)
+        {
+            var results = await _companyService.SearchAsync(q);
+            return Ok(results);
+        }
+
+        [HttpPost("bulk-delete")]
+        public async Task<ActionResult<int>> BulkDelete([FromBody] IEnumerable<int> ids)
+        {
+            var count = await _companyService.BulkDeleteAsync(ids, User.Identity?.Name ?? "system");
+            return Ok(count);
+        }
+
+        [HttpPost("bulk-restore")]
+        public async Task<ActionResult<int>> BulkRestore([FromBody] IEnumerable<int> ids)
+        {
+            var count = await _companyService.BulkRestoreAsync(ids, User.Identity?.Name ?? "system");
+            return Ok(count);
+        }
     }
 
     [ApiController]
@@ -86,6 +114,13 @@ namespace LocalCRM.WebApi.Controllers
         public async Task<ActionResult<IEnumerable<ContactDto>>> GetAll()
         {
             var results = await _contactService.GetAllAsync();
+            return Ok(results);
+        }
+
+        [HttpGet("deleted")]
+        public async Task<ActionResult<IEnumerable<ContactDto>>> GetDeleted()
+        {
+            var results = await _contactService.GetDeletedAsync();
             return Ok(results);
         }
 
@@ -130,6 +165,13 @@ namespace LocalCRM.WebApi.Controllers
             if (!success) return NotFound();
             return Ok();
         }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<ContactDto>>> Search([FromQuery] string q)
+        {
+            var results = await _contactService.SearchAsync(q);
+            return Ok(results);
+        }
     }
 
     [ApiController]
@@ -148,6 +190,13 @@ namespace LocalCRM.WebApi.Controllers
         public async Task<ActionResult<IEnumerable<InteractionDto>>> GetAll()
         {
             var results = await _interactionService.GetAllAsync();
+            return Ok(results);
+        }
+
+        [HttpGet("deleted")]
+        public async Task<ActionResult<IEnumerable<InteractionDto>>> GetDeleted()
+        {
+            var results = await _interactionService.GetDeletedAsync();
             return Ok(results);
         }
 
@@ -191,6 +240,13 @@ namespace LocalCRM.WebApi.Controllers
             var success = await _interactionService.RestoreAsync(id, User.Identity?.Name ?? "system");
             if (!success) return NotFound();
             return Ok();
+        }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<InteractionDto>>> Search([FromQuery] string q)
+        {
+            var results = await _interactionService.SearchAsync(q);
+            return Ok(results);
         }
     }
 }

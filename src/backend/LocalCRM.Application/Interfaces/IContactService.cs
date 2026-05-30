@@ -8,6 +8,7 @@ namespace LocalCRM.Application.Interfaces
     public interface IContactService
     {
         Task<IEnumerable<ContactDto>> GetAllAsync();
+        Task<IEnumerable<ContactDto>> GetDeletedAsync();
         Task<ContactDto?> GetByIdAsync(int id);
         Task<ContactDto> CreateAsync(CreateContactDto dto, string username);
         Task<bool> UpdateAsync(int id, UpdateContactDto dto, string username, DateTime updatedAt);
@@ -15,5 +16,6 @@ namespace LocalCRM.Application.Interfaces
         Task<bool> RestoreAsync(int id, string username);
         Task<int> BulkDeleteAsync(IEnumerable<int> ids, string username);
         Task<int> BulkRestoreAsync(IEnumerable<int> ids, string username);
+        Task<IEnumerable<ContactDto>> SearchAsync(string query);
     }
 }

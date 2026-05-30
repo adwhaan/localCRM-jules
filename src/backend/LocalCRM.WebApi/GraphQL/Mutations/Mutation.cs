@@ -14,8 +14,14 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
         // Companies
         public async Task<CompanyDto> CreateCompany(CreateCompanyDto input, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
             => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+
         public async Task<CompanyDto?> UpdateCompany(int id, UpdateCompanyDto input, DateTime updatedAt, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
-            => await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt) ? await s.GetByIdAsync(id) : null;
+        {
+            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
+            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
+            return await s.GetByIdAsync(id);
+        }
+
         public async Task<MutationResult> DeleteCompany(int id, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreCompany(int id, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
@@ -28,8 +34,14 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
         // Contacts
         public async Task<ContactDto> CreateContact(CreateContactDto input, [Service] IContactService s, [Service] IHttpContextAccessor h)
             => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+
         public async Task<ContactDto?> UpdateContact(int id, UpdateContactDto input, DateTime updatedAt, [Service] IContactService s, [Service] IHttpContextAccessor h)
-            => await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt) ? await s.GetByIdAsync(id) : null;
+        {
+            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
+            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
+            return await s.GetByIdAsync(id);
+        }
+
         public async Task<MutationResult> DeleteContact(int id, [Service] IContactService s, [Service] IHttpContextAccessor h)
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreContact(int id, [Service] IContactService s, [Service] IHttpContextAccessor h)
@@ -42,8 +54,14 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
         // Interactions
         public async Task<InteractionDto> CreateInteraction(CreateInteractionDto input, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
             => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+
         public async Task<InteractionDto?> UpdateInteraction(int id, UpdateInteractionDto input, DateTime updatedAt, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
-            => await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt) ? await s.GetByIdAsync(id) : null;
+        {
+            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
+            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
+            return await s.GetByIdAsync(id);
+        }
+
         public async Task<MutationResult> DeleteInteraction(int id, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreInteraction(int id, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
@@ -52,8 +70,14 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
         // Engagements
         public async Task<EngagementDto> CreateEngagement(CreateEngagementDto input, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
             => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+
         public async Task<EngagementDto?> UpdateEngagement(int id, UpdateEngagementDto input, DateTime updatedAt, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
-            => await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt) ? await s.GetByIdAsync(id) : null;
+        {
+            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
+            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
+            return await s.GetByIdAsync(id);
+        }
+
         public async Task<MutationResult> DeleteEngagement(int id, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreEngagement(int id, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
@@ -62,8 +86,14 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
         // Notes
         public async Task<NoteDto> CreateNote(CreateNoteDto input, [Service] INoteService s, [Service] IHttpContextAccessor h)
             => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+
         public async Task<NoteDto?> UpdateNote(int id, UpdateNoteDto input, DateTime updatedAt, [Service] INoteService s, [Service] IHttpContextAccessor h)
-            => await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt) ? await s.GetByIdAsync(id) : null;
+        {
+            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
+            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
+            return await s.GetByIdAsync(id);
+        }
+
         public async Task<MutationResult> DeleteNote(int id, [Service] INoteService s, [Service] IHttpContextAccessor h)
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreNote(int id, [Service] INoteService s, [Service] IHttpContextAccessor h)
@@ -72,8 +102,14 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
         // Documents
         public async Task<DocumentDto> CreateDocument(CreateDocumentDto input, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
             => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+
         public async Task<DocumentDto?> UpdateDocument(int id, UpdateDocumentDto input, DateTime updatedAt, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
-            => await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt) ? await s.GetByIdAsync(id) : null;
+        {
+            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
+            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
+            return await s.GetByIdAsync(id);
+        }
+
         public async Task<MutationResult> DeleteDocument(int id, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreDocument(int id, [Service] IDocumentService s, [Service] IHttpContextAccessor h)

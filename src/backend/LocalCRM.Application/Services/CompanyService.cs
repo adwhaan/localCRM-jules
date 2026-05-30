@@ -4,6 +4,7 @@ using LocalCRM.Application.Interfaces;
 using LocalCRM.Domain.Entities;
 using LocalCRM.Domain.Enums;
 using LocalCRM.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,12 @@ namespace LocalCRM.Application.Services
         public async Task<IEnumerable<CompanyDto>> GetAllAsync()
         {
             var companies = await _repo.GetAllAsync();
+            return _mapper.Map<IEnumerable<CompanyDto>>(companies);
+        }
+
+        public async Task<IEnumerable<CompanyDto>> GetDeletedAsync()
+        {
+            var companies = await _repo.QueryIgnoreFilters().Where(c => c.IsDeleted).ToListAsync();
             return _mapper.Map<IEnumerable<CompanyDto>>(companies);
         }
 
@@ -73,7 +80,7 @@ namespace LocalCRM.Application.Services
 
         public async Task<bool> RestoreAsync(int id, string username)
         {
-            var item = await _repo.GetByIdAsync(id);
+            var item = await _repo.QueryIgnoreFilters().FirstOrDefaultAsync(c => c.CompanyId == id);
             if (item == null || !item.IsDeleted) return false;
             item.IsDeleted = false;
             item.DeletedAt = null;
@@ -101,6 +108,14 @@ namespace LocalCRM.Application.Services
                 if (await RestoreAsync(id, username)) count++;
             }
             return count;
+        }
+
+        public async Task<IEnumerable<CompanyDto>> SearchAsync(string query)
+        {
+            var results = await _repo.Query()
+                .Where(c => c.Name.Contains(query) || (c.Website != null && c.Website.Contains(query)))
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<CompanyDto>>(results);
         }
     }
 }

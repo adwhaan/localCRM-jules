@@ -16,6 +16,7 @@ namespace LocalCRM.WebApi.Services
         {
             await context.Database.MigrateAsync();
 
+            // 1. Roles
             if (!await roleManager.RoleExistsAsync(Roles.Administrator))
             {
                 await roleManager.CreateAsync(new Role { Name = Roles.Administrator });
@@ -25,6 +26,7 @@ namespace LocalCRM.WebApi.Services
                 await roleManager.CreateAsync(new Role { Name = Roles.User });
             }
 
+            // 2. Permissions
             var permissionNames = typeof(Permissions).GetFields().Select(f => f.GetValue(null)?.ToString()).Where(n => n != null).Cast<string>();
             foreach (var name in permissionNames)
             {
@@ -35,6 +37,7 @@ namespace LocalCRM.WebApi.Services
             }
             await context.SaveChangesAsync();
 
+            // 3. Role-Permission assignments
             var adminRole = await roleManager.FindByNameAsync(Roles.Administrator);
             if (adminRole != null)
             {
@@ -46,9 +49,40 @@ namespace LocalCRM.WebApi.Services
                         context.RolePermissions.Add(new RolePermission { RoleId = adminRole.Id, PermissionId = p.PermissionId });
                     }
                 }
-                await context.SaveChangesAsync();
             }
 
+            var userRole = await roleManager.FindByNameAsync(Roles.User);
+            if (userRole != null)
+            {
+                // Assign baseline permissions to User role (example logic)
+                var baselinePermissions = new[] { Permissions.CompanyRead, Permissions.ContactRead, Permissions.InteractionRead };
+                foreach (var name in baselinePermissions)
+                {
+                    var p = await context.Permissions.FirstOrDefaultAsync(p => p.PermissionName == name);
+                    if (p != null && !await context.RolePermissions.AnyAsync(rp => rp.RoleId == userRole.Id && rp.PermissionId == p.PermissionId))
+                    {
+                        context.RolePermissions.Add(new RolePermission { RoleId = userRole.Id, PermissionId = p.PermissionId });
+                    }
+                }
+            }
+            await context.SaveChangesAsync();
+
+            // 4. Tags (Seed required tag groups if any)
+            if (!await context.Tags.AnyAsync())
+            {
+                context.Tags.Add(new Tag { TagGroup = "interaction_types", TagKey = "call", TagValue = "Call" });
+                context.Tags.Add(new Tag { TagGroup = "interaction_types", TagKey = "email", TagValue = "Email" });
+                context.Tags.Add(new Tag { TagGroup = "interaction_types", TagKey = "meeting", TagValue = "Meeting" });
+            }
+
+            // 5. Settings
+            if (!await context.Settings.AnyAsync(s => s.SettingKey == "system_name"))
+            {
+                context.Settings.Add(new Setting { SettingKey = "system_name", SettingValue = "LocalCRM" });
+            }
+            await context.SaveChangesAsync();
+
+            // 6. Admin User
             if (await userManager.FindByNameAsync("admin") == null)
             {
                 var user = new User
