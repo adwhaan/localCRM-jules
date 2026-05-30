@@ -26,10 +26,10 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreCompany(int id, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
             => await s.RestoreAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-        public async Task<int> BulkDeleteCompanies(IEnumerable<int> ids, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
-            => await s.BulkDeleteAsync(ids, h.HttpContext?.User.Identity?.Name ?? "system");
-        public async Task<int> BulkRestoreCompanies(IEnumerable<int> ids, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
-            => await s.BulkRestoreAsync(ids, h.HttpContext?.User.Identity?.Name ?? "system");
+        public async Task<MutationResult> BulkDeleteCompanies(IEnumerable<int> ids, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
+            => MutationResult.SuccessResult(await s.BulkDeleteAsync(ids, h.HttpContext?.User.Identity?.Name ?? "system"));
+        public async Task<MutationResult> BulkRestoreCompanies(IEnumerable<int> ids, [Service] ICompanyService s, [Service] IHttpContextAccessor h)
+            => MutationResult.SuccessResult(await s.BulkRestoreAsync(ids, h.HttpContext?.User.Identity?.Name ?? "system"));
 
         // Contacts
         public async Task<ContactDto> CreateContact(CreateContactDto input, [Service] IContactService s, [Service] IHttpContextAccessor h)
@@ -46,81 +46,36 @@ namespace LocalCRM.WebApi.GraphQL.Mutations
             => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
         public async Task<MutationResult> RestoreContact(int id, [Service] IContactService s, [Service] IHttpContextAccessor h)
             => await s.RestoreAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-        public async Task<int> BulkDeleteContacts(IEnumerable<int> ids, [Service] IContactService s, [Service] IHttpContextAccessor h)
-            => await s.BulkDeleteAsync(ids, h.HttpContext?.User.Identity?.Name ?? "system");
-        public async Task<int> BulkRestoreContacts(IEnumerable<int> ids, [Service] IContactService s, [Service] IHttpContextAccessor h)
-            => await s.BulkRestoreAsync(ids, h.HttpContext?.User.Identity?.Name ?? "system");
 
-        // Interactions
-        public async Task<InteractionDto> CreateInteraction(CreateInteractionDto input, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
-            => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
+        // User Management
+        public async Task<MutationResult> DisableUser(int id, [Service] IUserService s) => await s.UpdateStatusAsync(id, false) ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
+        public async Task<MutationResult> EnableUser(int id, [Service] IUserService s) => await s.UpdateStatusAsync(id, true) ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
+        public async Task<MutationResult> ResetUserPassword(int id, string newPassword, [Service] IAuthService auth, [Service] IHttpContextAccessor h)
+            => await auth.ResetPasswordAsync(id, newPassword, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
 
-        public async Task<InteractionDto?> UpdateInteraction(int id, UpdateInteractionDto input, DateTime updatedAt, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
+        // Settings
+        public async Task<SettingDto?> UpdateSetting(string key, string value, [Service] ISettingService s)
         {
-            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
-            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
-            return await s.GetByIdAsync(id);
+            await s.UpdateAsync(key, value);
+            return await s.GetByKeyAsync(key);
         }
 
-        public async Task<MutationResult> DeleteInteraction(int id, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
-            => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-        public async Task<MutationResult> RestoreInteraction(int id, [Service] IInteractionService s, [Service] IHttpContextAccessor h)
-            => await s.RestoreAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-
-        // Engagements
-        public async Task<EngagementDto> CreateEngagement(CreateEngagementDto input, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
-            => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
-
-        public async Task<EngagementDto?> UpdateEngagement(int id, UpdateEngagementDto input, DateTime updatedAt, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
-        {
-            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
-            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
-            return await s.GetByIdAsync(id);
-        }
-
-        public async Task<MutationResult> DeleteEngagement(int id, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
-            => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-        public async Task<MutationResult> RestoreEngagement(int id, [Service] IEngagementService s, [Service] IHttpContextAccessor h)
-            => await s.RestoreAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-
-        // Notes
-        public async Task<NoteDto> CreateNote(CreateNoteDto input, [Service] INoteService s, [Service] IHttpContextAccessor h)
-            => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
-
-        public async Task<NoteDto?> UpdateNote(int id, UpdateNoteDto input, DateTime updatedAt, [Service] INoteService s, [Service] IHttpContextAccessor h)
-        {
-            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
-            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
-            return await s.GetByIdAsync(id);
-        }
-
-        public async Task<MutationResult> DeleteNote(int id, [Service] INoteService s, [Service] IHttpContextAccessor h)
-            => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-        public async Task<MutationResult> RestoreNote(int id, [Service] INoteService s, [Service] IHttpContextAccessor h)
-            => await s.RestoreAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-
-        // Documents
-        public async Task<DocumentDto> CreateDocument(CreateDocumentDto input, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
-            => await s.CreateAsync(input, h.HttpContext?.User.Identity?.Name ?? "system");
-
-        public async Task<DocumentDto?> UpdateDocument(int id, UpdateDocumentDto input, DateTime updatedAt, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
-        {
-            var success = await s.UpdateAsync(id, input, h.HttpContext?.User.Identity?.Name ?? "system", updatedAt);
-            if (!success) throw new GraphQLException(ErrorBuilder.New().SetMessage("The record has been modified by another user.").SetCode("concurrency_conflict").Build());
-            return await s.GetByIdAsync(id);
-        }
-
-        public async Task<MutationResult> DeleteDocument(int id, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
-            => await s.DeleteAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
-        public async Task<MutationResult> RestoreDocument(int id, [Service] IDocumentService s, [Service] IHttpContextAccessor h)
-            => await s.RestoreAsync(id, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(id) : MutationResult.FailureResult();
+        // Roles
+        public async Task<MutationResult> AssignPermissionToRole(int roleId, int permissionId, [Service] IRoleService s)
+            => await s.AddPermissionToRoleAsync(roleId, permissionId) ? MutationResult.SuccessResult(roleId) : MutationResult.FailureResult();
+        public async Task<MutationResult> RemovePermissionFromRole(int roleId, int permissionId, [Service] IRoleService s)
+            => await s.RemovePermissionFromRoleAsync(roleId, permissionId) ? MutationResult.SuccessResult(roleId) : MutationResult.FailureResult();
 
         // Auth
         public async Task<AuthPayloadDto> Login(LoginDto input, [Service] IAuthService s, [Service] IHttpContextAccessor h)
             => await s.LoginAsync(input, h.HttpContext?.Connection.RemoteIpAddress?.ToString(), h.HttpContext?.Request.Headers["User-Agent"]);
         public async Task<AuthPayloadDto> RefreshToken(string refreshToken, [Service] IAuthService s, [Service] IHttpContextAccessor h)
             => await s.RefreshTokenAsync(refreshToken, h.HttpContext?.Connection.RemoteIpAddress?.ToString(), h.HttpContext?.Request.Headers["User-Agent"]);
-        public async Task<bool> RevokeToken(string refreshToken, [Service] IAuthService s, [Service] IHttpContextAccessor h)
-            => await s.RevokeTokenAsync(refreshToken, h.HttpContext?.User.Identity?.Name ?? "system");
+        public async Task<MutationResult> Logout(string refreshToken, [Service] IAuthService s, [Service] IHttpContextAccessor h)
+            => await s.RevokeTokenAsync(refreshToken, h.HttpContext?.User.Identity?.Name ?? "system") ? MutationResult.SuccessResult(0) : MutationResult.FailureResult();
+        public async Task<MutationResult> ChangePassword(ChangePasswordDto input, [Service] IAuthService s, [Service] IHttpContextAccessor h)
+            => await s.ChangePasswordAsync(h.HttpContext?.User.Identity?.Name ?? "", input.CurrentPassword, input.NewPassword) ? MutationResult.SuccessResult(0) : MutationResult.FailureResult();
     }
+
+    public class ChangePasswordDto { public string CurrentPassword { get; set; } = ""; public string NewPassword { get; set; } = ""; }
 }

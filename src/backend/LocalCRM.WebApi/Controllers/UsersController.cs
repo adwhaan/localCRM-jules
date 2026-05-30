@@ -2,13 +2,14 @@ using LocalCRM.Application.DTOs;
 using LocalCRM.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LocalCRM.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -21,32 +22,20 @@ namespace LocalCRM.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
-        {
-            return Ok(await _userService.GetAllAsync());
-        }
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAll() => Ok(await _userService.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetById(int id)
         {
             var user = await _userService.GetByIdAsync(id);
-            if (user == null) return NotFound();
-            return Ok(user);
+            return user != null ? Ok(user) : NotFound();
         }
 
         [HttpPost("{id}/disable")]
-        public async Task<IActionResult> Disable(int id)
-        {
-            var success = await _userService.DisableAsync(id, User.Identity?.Name ?? "system");
-            return success ? Ok() : NotFound();
-        }
+        public async Task<IActionResult> Disable(int id) => await _userService.UpdateStatusAsync(id, false) ? Ok() : NotFound();
 
         [HttpPost("{id}/enable")]
-        public async Task<IActionResult> Enable(int id)
-        {
-            var success = await _userService.EnableAsync(id, User.Identity?.Name ?? "system");
-            return success ? Ok() : NotFound();
-        }
+        public async Task<IActionResult> Enable(int id) => await _userService.UpdateStatusAsync(id, true) ? Ok() : NotFound();
 
         [HttpPost("{id}/reset-password")]
         public async Task<IActionResult> ResetPassword(int id, [FromBody] string newPassword)

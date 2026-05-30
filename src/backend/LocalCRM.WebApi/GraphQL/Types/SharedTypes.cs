@@ -2,6 +2,9 @@ using LocalCRM.Application.DTOs;
 using HotChocolate.Types;
 using HotChocolate;
 using LocalCRM.Application.Interfaces;
+using LocalCRM.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -16,11 +19,33 @@ namespace LocalCRM.WebApi.GraphQL.Types
 
             descriptor.Field("contacts")
                 .Resolve(async (ctx, ct) => {
-                    var service = ctx.Service<IContactService>();
-                    // Simplified: In a real app we'd filter by CompanyId via a join or specific service method
-                    return await service.GetAllAsync();
+                    var id = ctx.Parent<CompanyDto>().CompanyId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.CompanyContactLinks.Where(l => l.CompanyId == id).Select(l => l.Contact).ToListAsync();
+                    return mapper.Map<IEnumerable<ContactDto>>(items);
                 })
                 .Type<ListType<ContactType>>();
+
+            descriptor.Field("notes")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<CompanyDto>().CompanyId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.CompanyNoteLinks.Where(l => l.CompanyId == id).Select(l => l.Note).ToListAsync();
+                    return mapper.Map<IEnumerable<NoteDto>>(items);
+                })
+                .Type<ListType<NoteType>>();
+
+            descriptor.Field("documents")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<CompanyDto>().CompanyId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.CompanyDocumentLinks.Where(l => l.CompanyId == id).Select(l => l.Document).ToListAsync();
+                    return mapper.Map<IEnumerable<DocumentDto>>(items);
+                })
+                .Type<ListType<DocumentType>>();
         }
     }
 
@@ -29,6 +54,16 @@ namespace LocalCRM.WebApi.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<ContactDto> descriptor)
         {
             descriptor.Field(t => t.ContactId).Type<NonNullType<IdType>>();
+
+            descriptor.Field("notes")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<ContactDto>().ContactId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.ContactNoteLinks.Where(l => l.ContactId == id).Select(l => l.Note).ToListAsync();
+                    return mapper.Map<IEnumerable<NoteDto>>(items);
+                })
+                .Type<ListType<NoteType>>();
         }
     }
 
@@ -51,6 +86,26 @@ namespace LocalCRM.WebApi.GraphQL.Types
                     return id.HasValue ? await ctx.Service<ICompanyService>().GetByIdAsync(id.Value) : null;
                 })
                 .Type<CompanyType>();
+
+            descriptor.Field("notes")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<InteractionDto>().InteractionId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.InteractionNoteLinks.Where(l => l.InteractionId == id).Select(l => l.Note).ToListAsync();
+                    return mapper.Map<IEnumerable<NoteDto>>(items);
+                })
+                .Type<ListType<NoteType>>();
+
+            descriptor.Field("documents")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<InteractionDto>().InteractionId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.InteractionDocumentLinks.Where(l => l.InteractionId == id).Select(l => l.Document).ToListAsync();
+                    return mapper.Map<IEnumerable<DocumentDto>>(items);
+                })
+                .Type<ListType<DocumentType>>();
         }
     }
 
@@ -59,6 +114,36 @@ namespace LocalCRM.WebApi.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<EngagementDto> descriptor)
         {
             descriptor.Field(t => t.EngagementId).Type<NonNullType<IdType>>();
+
+            descriptor.Field("companies")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<EngagementDto>().EngagementId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.EngagementCompanyLinks.Where(l => l.EngagementId == id).Select(l => l.Company).ToListAsync();
+                    return mapper.Map<IEnumerable<CompanyDto>>(items);
+                })
+                .Type<ListType<CompanyType>>();
+
+            descriptor.Field("contacts")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<EngagementDto>().EngagementId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.EngagementContactLinks.Where(l => l.EngagementId == id).Select(l => l.Contact).ToListAsync();
+                    return mapper.Map<IEnumerable<ContactDto>>(items);
+                })
+                .Type<ListType<ContactType>>();
+
+            descriptor.Field("notes")
+                .Resolve(async (ctx, ct) => {
+                    var id = ctx.Parent<EngagementDto>().EngagementId;
+                    var context = ctx.Service<LocalCRMContext>();
+                    var mapper = ctx.Service<IMapper>();
+                    var items = await context.EngagementNoteLinks.Where(l => l.EngagementId == id).Select(l => l.Note).ToListAsync();
+                    return mapper.Map<IEnumerable<NoteDto>>(items);
+                })
+                .Type<ListType<NoteType>>();
         }
     }
 

@@ -56,11 +56,13 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = true,
+        ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "SUPER_SECRET_KEY_FOR_LOCALCRM_DEVELOPMENT_PURPOSES_LONG_ENOUGH"))
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "LocalCRM",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "LocalCRM",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is missing from configuration.")))
     };
 });
 
@@ -83,6 +85,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddSingleton<ISystemMetricsService, SystemMetricsService>();
 builder.Services.AddScoped<IExportService, ExportService>();
+builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services
     .AddGraphQLServer()
@@ -91,6 +97,11 @@ builder.Services
     .AddType<CompanyType>()
     .AddType<ContactType>()
     .AddType<InteractionType>()
+    .AddType<EngagementType>()
+    .AddType<NoteType>()
+    .AddType<DocumentType>()
+    .AddType<UserType>()
+    .AddType<AuditLogType>()
     .AddFiltering()
     .AddSorting();
 

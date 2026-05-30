@@ -1,0 +1,31 @@
+@page "/settings"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Services
+@inject ApiService Api
+
+<PageTitle>Settings</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Settings</MudText>
+
+@if (items == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="@items" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Key</MudTh>
+            <MudTh>Value</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Key">@context.SettingKey</MudTd>
+            <MudTd DataLabel="Value">@context.SettingValue</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<SettingDto>? items;
+    protected override async Task OnInitializedAsync() => items = await Api.GetSettingsAsync();
+}

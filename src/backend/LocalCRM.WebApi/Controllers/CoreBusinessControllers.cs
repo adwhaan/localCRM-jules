@@ -1,45 +1,54 @@
 using LocalCRM.Application.DTOs;
 using LocalCRM.Application.Interfaces;
+using LocalCRM.Domain.Entities;
+using LocalCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace LocalCRM.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/companies")]
     [Authorize]
     public class CompaniesController : ControllerBase
     {
         private readonly ICompanyService _companyService;
+        private readonly LocalCRMContext _context;
+        private readonly IMapper _mapper;
+        private readonly IExportService _exportService;
 
-        public CompaniesController(ICompanyService companyService)
+        public CompaniesController(ICompanyService companyService, LocalCRMContext context, IMapper mapper, IExportService exportService)
         {
             _companyService = companyService;
+            _context = context;
+            _mapper = mapper;
+            _exportService = exportService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetAll()
-        {
-            var results = await _companyService.GetAllAsync();
-            return Ok(results);
-        }
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetAll() => Ok(await _companyService.GetAllAsync());
 
         [HttpGet("deleted")]
-        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetDeleted()
-        {
-            var results = await _companyService.GetDeletedAsync();
-            return Ok(results);
-        }
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetDeleted() => Ok(await _companyService.GetDeletedAsync());
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CompanyDto>> GetById(int id)
         {
             var result = await _companyService.GetByIdAsync(id);
-            if (result == null) return NotFound();
-            return Ok(result);
+            return result != null ? Ok(result) : NotFound();
+        }
+
+        [HttpGet("by-ref/{companyRef}")]
+        public async Task<ActionResult<CompanyDto>> GetByRef(string companyRef)
+        {
+            var result = await _context.Companies.FirstOrDefaultAsync(c => c.CompanyRef == companyRef);
+            return result != null ? Ok(_mapper.Map<CompanyDto>(result)) : NotFound();
         }
 
         [HttpPost]
@@ -52,84 +61,73 @@ namespace LocalCRM.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCompanyDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr)
         {
-            if (!DateTime.TryParse(updatedAtStr, out var updatedAt))
-                return BadRequest("Missing or invalid If-Match header (UpdatedAt)");
-
-            var success = await _companyService.UpdateAsync(id, dto, User.Identity?.Name ?? "system", updatedAt);
-            if (!success) return Conflict(new { code = "concurrency_conflict", message = "The record has been modified by another user." });
-            return NoContent();
+            if (!DateTime.TryParse(updatedAtStr, out var updatedAt)) return BadRequest("Missing If-Match");
+            return await _companyService.UpdateAsync(id, dto, User.Identity?.Name ?? "system", updatedAt) ? NoContent() : Conflict();
         }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch(int id, [FromBody] UpdateCompanyDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr) => await Update(id, dto, updatedAtStr);
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var success = await _companyService.DeleteAsync(id, User.Identity?.Name ?? "system");
-            if (!success) return NotFound();
-            return NoContent();
-        }
+        public async Task<IActionResult> Delete(int id) => await _companyService.DeleteAsync(id, User.Identity?.Name ?? "system") ? NoContent() : NotFound();
 
         [HttpPost("{id}/restore")]
-        public async Task<IActionResult> Restore(int id)
-        {
-            var success = await _companyService.RestoreAsync(id, User.Identity?.Name ?? "system");
-            if (!success) return NotFound();
-            return Ok();
-        }
+        public async Task<IActionResult> Restore(int id) => await _companyService.RestoreAsync(id, User.Identity?.Name ?? "system") ? Ok() : NotFound();
 
         [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<CompanyDto>>> Search([FromQuery] string q)
-        {
-            var results = await _companyService.SearchAsync(q);
-            return Ok(results);
-        }
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> Search([FromQuery] string q) => Ok(await _companyService.SearchAsync(q));
 
         [HttpPost("bulk-delete")]
-        public async Task<ActionResult<int>> BulkDelete([FromBody] IEnumerable<int> ids)
-        {
-            var count = await _companyService.BulkDeleteAsync(ids, User.Identity?.Name ?? "system");
-            return Ok(count);
-        }
+        public async Task<ActionResult<int>> BulkDelete([FromBody] IEnumerable<int> ids) => Ok(await _companyService.BulkDeleteAsync(ids, User.Identity?.Name ?? "system"));
 
         [HttpPost("bulk-restore")]
-        public async Task<ActionResult<int>> BulkRestore([FromBody] IEnumerable<int> ids)
+        public async Task<ActionResult<int>> BulkRestore([FromBody] IEnumerable<int> ids) => Ok(await _companyService.BulkRestoreAsync(ids, User.Identity?.Name ?? "system"));
+
+        [HttpPost("export")]
+        public async Task<IActionResult> Export()
         {
-            var count = await _companyService.BulkRestoreAsync(ids, User.Identity?.Name ?? "system");
-            return Ok(count);
+            var data = await _companyService.GetAllAsync();
+            var csv = await _exportService.ExportToCsvAsync(data);
+            return File(csv, "text/csv", "companies.csv");
         }
     }
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/contacts")]
     [Authorize]
     public class ContactsController : ControllerBase
     {
         private readonly IContactService _contactService;
+        private readonly LocalCRMContext _context;
+        private readonly IMapper _mapper;
+        private readonly IExportService _exportService;
 
-        public ContactsController(IContactService contactService)
+        public ContactsController(IContactService contactService, LocalCRMContext context, IMapper mapper, IExportService exportService)
         {
             _contactService = contactService;
+            _context = context;
+            _mapper = mapper;
+            _exportService = exportService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ContactDto>>> GetAll()
-        {
-            var results = await _contactService.GetAllAsync();
-            return Ok(results);
-        }
+        public async Task<ActionResult<IEnumerable<ContactDto>>> GetAll() => Ok(await _contactService.GetAllAsync());
 
         [HttpGet("deleted")]
-        public async Task<ActionResult<IEnumerable<ContactDto>>> GetDeleted()
-        {
-            var results = await _contactService.GetDeletedAsync();
-            return Ok(results);
-        }
+        public async Task<ActionResult<IEnumerable<ContactDto>>> GetDeleted() => Ok(await _contactService.GetDeletedAsync());
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ContactDto>> GetById(int id)
         {
             var result = await _contactService.GetByIdAsync(id);
-            if (result == null) return NotFound();
-            return Ok(result);
+            return result != null ? Ok(result) : NotFound();
+        }
+
+        [HttpGet("by-ref/{contactRef}")]
+        public async Task<ActionResult<ContactDto>> GetByRef(string contactRef)
+        {
+            var result = await _context.Contacts.FirstOrDefaultAsync(c => c.ContactRef == contactRef);
+            return result != null ? Ok(_mapper.Map<ContactDto>(result)) : NotFound();
         }
 
         [HttpPost]
@@ -142,111 +140,49 @@ namespace LocalCRM.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateContactDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr)
         {
-            if (!DateTime.TryParse(updatedAtStr, out var updatedAt))
-                return BadRequest("Missing or invalid If-Match header (UpdatedAt)");
-
-            var success = await _contactService.UpdateAsync(id, dto, User.Identity?.Name ?? "system", updatedAt);
-            if (!success) return Conflict(new { code = "concurrency_conflict", message = "The record has been modified by another user." });
-            return NoContent();
+            if (!DateTime.TryParse(updatedAtStr, out var updatedAt)) return BadRequest("Missing If-Match");
+            return await _contactService.UpdateAsync(id, dto, User.Identity?.Name ?? "system", updatedAt) ? NoContent() : Conflict();
         }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch(int id, [FromBody] UpdateContactDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr) => await Update(id, dto, updatedAtStr);
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var success = await _contactService.DeleteAsync(id, User.Identity?.Name ?? "system");
-            if (!success) return NotFound();
-            return NoContent();
-        }
+        public async Task<IActionResult> Delete(int id) => await _contactService.DeleteAsync(id, User.Identity?.Name ?? "system") ? NoContent() : NotFound();
 
         [HttpPost("{id}/restore")]
-        public async Task<IActionResult> Restore(int id)
-        {
-            var success = await _contactService.RestoreAsync(id, User.Identity?.Name ?? "system");
-            if (!success) return NotFound();
-            return Ok();
-        }
+        public async Task<IActionResult> Restore(int id) => await _contactService.RestoreAsync(id, User.Identity?.Name ?? "system") ? Ok() : NotFound();
 
         [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<ContactDto>>> Search([FromQuery] string q)
+        public async Task<ActionResult<IEnumerable<ContactDto>>> Search([FromQuery] string q) => Ok(await _contactService.SearchAsync(q));
+
+        [HttpPost("export")]
+        public async Task<IActionResult> Export()
         {
-            var results = await _contactService.SearchAsync(q);
-            return Ok(results);
+            var data = await _contactService.GetAllAsync();
+            var csv = await _exportService.ExportToCsvAsync(data);
+            return File(csv, "text/csv", "contacts.csv");
         }
     }
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/interactions")]
     [Authorize]
     public class InteractionsController : ControllerBase
     {
         private readonly IInteractionService _interactionService;
+        private readonly IExportService _exportService;
+        public InteractionsController(IInteractionService interactionService, IExportService exportService) { _interactionService = interactionService; _exportService = exportService; }
 
-        public InteractionsController(IInteractionService interactionService)
-        {
-            _interactionService = interactionService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<InteractionDto>>> GetAll()
-        {
-            var results = await _interactionService.GetAllAsync();
-            return Ok(results);
-        }
-
-        [HttpGet("deleted")]
-        public async Task<ActionResult<IEnumerable<InteractionDto>>> GetDeleted()
-        {
-            var results = await _interactionService.GetDeletedAsync();
-            return Ok(results);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<InteractionDto>> GetById(int id)
-        {
-            var result = await _interactionService.GetByIdAsync(id);
-            if (result == null) return NotFound();
-            return Ok(result);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<InteractionDto>> Create([FromBody] CreateInteractionDto dto)
-        {
-            var result = await _interactionService.CreateAsync(dto, User.Identity?.Name ?? "system");
-            return CreatedAtAction(nameof(GetById), new { id = result.InteractionId }, result);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateInteractionDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr)
-        {
-            if (!DateTime.TryParse(updatedAtStr, out var updatedAt))
-                return BadRequest("Missing or invalid If-Match header (UpdatedAt)");
-
-            var success = await _interactionService.UpdateAsync(id, dto, User.Identity?.Name ?? "system", updatedAt);
-            if (!success) return Conflict(new { code = "concurrency_conflict", message = "The record has been modified by another user." });
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var success = await _interactionService.DeleteAsync(id, User.Identity?.Name ?? "system");
-            if (!success) return NotFound();
-            return NoContent();
-        }
-
-        [HttpPost("{id}/restore")]
-        public async Task<IActionResult> Restore(int id)
-        {
-            var success = await _interactionService.RestoreAsync(id, User.Identity?.Name ?? "system");
-            if (!success) return NotFound();
-            return Ok();
-        }
-
-        [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<InteractionDto>>> Search([FromQuery] string q)
-        {
-            var results = await _interactionService.SearchAsync(q);
-            return Ok(results);
-        }
+        [HttpGet] public async Task<ActionResult<IEnumerable<InteractionDto>>> GetAll() => Ok(await _interactionService.GetAllAsync());
+        [HttpGet("deleted")] public async Task<ActionResult<IEnumerable<InteractionDto>>> GetDeleted() => Ok(await _interactionService.GetDeletedAsync());
+        [HttpGet("{id}")] public async Task<ActionResult<InteractionDto>> GetById(int id) { var r = await _interactionService.GetByIdAsync(id); return r != null ? Ok(r) : NotFound(); }
+        [HttpPost] public async Task<ActionResult<InteractionDto>> Create([FromBody] CreateInteractionDto dto) { var r = await _interactionService.CreateAsync(dto, User.Identity?.Name ?? "system"); return CreatedAtAction(nameof(GetById), new { id = r.InteractionId }, r); }
+        [HttpPut("{id}")] public async Task<IActionResult> Update(int id, [FromBody] UpdateInteractionDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr) { if (!DateTime.TryParse(updatedAtStr, out var u)) return BadRequest("Missing If-Match"); return await _interactionService.UpdateAsync(id, dto, User.Identity?.Name ?? "system", u) ? NoContent() : Conflict(); }
+        [HttpPatch("{id}")] public async Task<IActionResult> Patch(int id, [FromBody] UpdateInteractionDto dto, [FromHeader(Name = "If-Match")] string? updatedAtStr) => await Update(id, dto, updatedAtStr);
+        [HttpDelete("{id}")] public async Task<IActionResult> Delete(int id) => await _interactionService.DeleteAsync(id, User.Identity?.Name ?? "system") ? NoContent() : NotFound();
+        [HttpPost("{id}/restore")] public async Task<IActionResult> Restore(int id) => await _interactionService.RestoreAsync(id, User.Identity?.Name ?? "system") ? Ok() : NotFound();
+        [HttpPost("search")] public async Task<ActionResult<IEnumerable<InteractionDto>>> Search([FromQuery] string q) => Ok(await _interactionService.SearchAsync(q));
+        [HttpPost("export")] public async Task<IActionResult> Export() { var data = await _interactionService.GetAllAsync(); var csv = await _exportService.ExportToCsvAsync(data); return File(csv, "text/csv", "interactions.csv"); }
     }
 }
