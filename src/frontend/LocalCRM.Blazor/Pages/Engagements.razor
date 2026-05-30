@@ -1,0 +1,33 @@
+@page "/engagements"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Services
+@inject ApiService Api
+
+<PageTitle>Engagements</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Engagements</MudText>
+
+@if (items == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="@items" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Reference</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Reference">@context.EngagementRef</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="Status">@context.EngagementStatus</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<EngagementDto>? items;
+    protected override async Task OnInitializedAsync() => items = await Api.GetEngagementsAsync();
+}

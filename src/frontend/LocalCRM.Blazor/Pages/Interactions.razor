@@ -1,0 +1,33 @@
+@page "/interactions"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Services
+@inject ApiService Api
+
+<PageTitle>Interactions</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Interactions</MudText>
+
+@if (items == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="@items" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Date</MudTh>
+            <MudTh>Subject</MudTh>
+            <MudTh>Type</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Date">@context.InteractionDate.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Subject">@context.Subject</MudTd>
+            <MudTd DataLabel="Type">@context.InteractionType</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<InteractionDto>? items;
+    protected override async Task OnInitializedAsync() => items = await Api.GetInteractionsAsync();
+}

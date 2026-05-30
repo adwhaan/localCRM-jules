@@ -1,0 +1,53 @@
+@page "/companies/{id:int}"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Services
+@inject ApiService Api
+
+<PageTitle>Company Details</PageTitle>
+
+@if (company == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudText Typo="Typo.h4" GutterBottom="true">@company.Name</MudText>
+    <MudText Typo="Typo.subtitle1" GutterBottom="true">@company.City, @company.Website</MudText>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Contacts">
+            <MudTable Items="@contacts" Hover="true">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Email</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.FirstName @context.LastName</MudTd>
+                    <MudTd>@context.Email</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudTabPanel>
+        <MudTabPanel Text="Notes">
+            <MudList T="string">
+                @foreach (var note in notes)
+                {
+                    <MudListItem Text="@note.Subject" SecondaryText="@note.Body" />
+                }
+            </MudList>
+        </MudTabPanel>
+    </MudTabs>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private CompanyDto? company;
+    private IEnumerable<ContactDto> contacts = new List<ContactDto>();
+    private IEnumerable<NoteDto> notes = new List<NoteDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        company = await Api.GetCompanyAsync(id);
+        contacts = await Api.GetCompanyContactsAsync(id) ?? new List<ContactDto>();
+        notes = await Api.GetCompanyNotesAsync(id) ?? new List<NoteDto>();
+    }
+}

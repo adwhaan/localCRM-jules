@@ -1,0 +1,33 @@
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+
+    <AuthorizePermission Permission="companies.read">
+        <MudNavLink Href="/companies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Business">Companies</MudNavLink>
+    </AuthorizePermission>
+
+    <AuthorizePermission Permission="contacts.read">
+        <MudNavLink Href="/contacts" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Contacts</MudNavLink>
+    </AuthorizePermission>
+
+    <AuthorizePermission Permission="interactions.read">
+        <MudNavLink Href="/interactions" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Forum">Interactions</MudNavLink>
+    </AuthorizePermission>
+
+    <AuthorizePermission Permission="engagements.read">
+        <MudNavLink Href="/engagements" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assignment">Engagements</MudNavLink>
+    </AuthorizePermission>
+
+    <MudDivider Class="my-2" />
+
+    <AuthorizePermission Permission="users.read">
+        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">Users</MudNavLink>
+    </AuthorizePermission>
+
+    <AuthorizePermission Permission="settings.manage">
+        <MudNavLink Href="/settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+    </AuthorizePermission>
+
+    <AuthorizePermission Permission="audit.read">
+        <MudNavLink Href="/audit-logs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ListAlt">Audit Logs</MudNavLink>
+    </AuthorizePermission>
+</MudNavMenu>

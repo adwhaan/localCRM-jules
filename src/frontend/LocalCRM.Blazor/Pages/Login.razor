@@ -1,0 +1,49 @@
+@page "/login"
+@using LocalCRM.Application.DTOs
+@using LocalCRM.Blazor.Auth
+@inject HttpClient Http
+@inject JwtAuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+    <MudPaper Class="pa-8" Elevation="3">
+        <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Login</MudText>
+        <MudTextField @bind-Value="model.Username" Label="Username" Variant="Variant.Outlined" Class="mt-4" />
+        <MudTextField @bind-Value="model.Password" Label="Password" Variant="Variant.Outlined" InputType="InputType.Password" Class="mt-4" />
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-4">@error</MudAlert>
+        }
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-6" OnClick="Submit">Login</MudButton>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private LoginDto model = new();
+    private string? error;
+
+    private async Task Submit()
+    {
+        var response = await Http.PostAsJsonAsync("api/auth/login", model);
+        var result = await response.Content.ReadFromJsonAsync<AuthPayloadDto>();
+
+        if (result?.ErrorCode == "password_change_required")
+        {
+            Navigation.NavigateTo($"/change-password-required?username={model.Username}");
+            return;
+        }
+
+        if (response.IsSuccessStatusCode && result?.AccessToken != null)
+        {
+            AuthProvider.NotifyUserAuthentication(result.AccessToken);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            error = result?.ErrorCode ?? "Invalid credentials";
+        }
+    }
+}
