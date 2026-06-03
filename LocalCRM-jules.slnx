@@ -1,0 +1,13 @@
+<Solution>
+	<Folder Name="/src/backend/">
+		<Project Path="src/backend/LocalCRM.API/LocalCRM.API.csproj" />
+		<Project Path="src/backend/LocalCRM.Application/LocalCRM.Application.csproj" />
+		<Project Path="src/backend/LocalCRM.Domain/LocalCRM.Domain.csproj" />
+		<Project Path="src/backend/LocalCRM.Infrastructure/LocalCRM.Infrastructure.csproj" />
+		<Project Path="src/backend/LocalCRM.Tests/LocalCRM.Tests.csproj" />
+	</Folder>
+	<Folder Name="/src/frontend/blazor/">
+	</Folder>
+	<Folder Name="/src/frontend/angular/">
+	</Folder>
+</Solution>
