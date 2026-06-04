@@ -1,11 +1,13 @@
 using LocalCRM.API.GraphQL.Queries;
-using LocalCRM.Application.Interfaces;
-using LocalCRM.Domain.Entities;
-using LocalCRM.Infrastructure.Identity;
+using LocalCRM.API.GraphQL.Mutations;
+using LocalCRM.Application;
+using LocalCRM.Infrastructure;
 using LocalCRM.Infrastructure.Persistence;
-using LocalCRM.Infrastructure.Services;
+using LocalCRM.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace LocalCRM.API;
 
@@ -15,16 +17,40 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=localcrm.db"));
+        // Configuration
+        var jwtKey = builder.Configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey) && !args.Contains("--init"))
+        {
+             jwtKey = "placeholder_key_at_least_32_characters_long_for_development";
+        }
+
+        // Add services
+        builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddApplication();
+        builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddScoped<IAuditService, AuditService>();
-        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey ?? "placeholder_key_at_least_32_characters_long_for_development"))
+            };
+        });
 
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
@@ -32,7 +58,19 @@ public class Program
 
         builder.Services
             .AddGraphQLServer()
-            .AddQueryType<CompanyQueries>()
+            .AddQueryType(q => q.Name("Query"))
+                .AddType<CompanyQueries>()
+                .AddType<ContactQueries>()
+                .AddType<InteractionQueries>()
+                .AddType<EngagementQueries>()
+                .AddType<NoteQueries>()
+                .AddType<DocumentQueries>()
+            .AddMutationType(m => m.Name("Mutation"))
+                .AddType<CompanyMutations>()
+                .AddType<ContactMutations>()
+                .AddType<EngagementMutations>()
+                .AddType<NoteMutations>()
+                .AddType<DocumentMutations>()
             .AddFiltering()
             .AddSorting()
             .AddProjections();
@@ -46,7 +84,7 @@ public class Program
             return;
         }
 
-        // Configure the HTTP request pipeline.
+        // Pipeline
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -71,26 +109,21 @@ public class Program
 
         await context.Database.EnsureCreatedAsync();
 
-        // Seed roles
         if (!await roleManager.RoleExistsAsync("Administrator"))
-        {
             await roleManager.CreateAsync(new ApplicationRole { Name = "Administrator" });
-        }
 
-        // Seed admin user
+        if (!await roleManager.RoleExistsAsync("User"))
+            await roleManager.CreateAsync(new ApplicationRole { Name = "User" });
+
         var adminEmail = "admin@localcrm.local";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
             var password = args.FirstOrDefault(a => a.StartsWith("--password="))?.Split('=')[1] ?? "DefaultAdminPassword123!";
-            adminUser = new ApplicationUser
-            {
-                UserName = "admin",
-                Email = adminEmail,
-                CreatedBy = "system"
-            };
-            await userManager.CreateAsync(adminUser, password);
-            await userManager.AddToRoleAsync(adminUser, "Administrator");
+            adminUser = new ApplicationUser { UserName = "admin", Email = adminEmail, CreatedBy = "system" };
+            var result = await userManager.CreateAsync(adminUser, password);
+            if (result.Succeeded) await userManager.AddToRoleAsync(adminUser, "Administrator");
+            else Console.WriteLine("Admin user creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
         Console.WriteLine("Database initialized successfully.");

@@ -16,4 +16,5 @@ public class Interaction : BaseEntity
     public Interaction? PrevInteraction { get; set; }
     public string? InteractionTags { get; set; }
     public bool IsTask { get; set; }
+    public InteractionLink? InteractionLink { get; set; }
 }

@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using LocalCRM.Domain.Entities;
+using LocalCRM.Application.DTOs;
 
 namespace LocalCRM.Application.Interfaces;
 
@@ -10,4 +10,4 @@ public interface IAuthService
     Task<bool> RevokeTokenAsync(string refreshToken);
 }
 
-public record AuthResponse(string AccessToken, string RefreshToken, ApplicationUser User);
+public record AuthResponse(string AccessToken, string RefreshToken, UserDto User);

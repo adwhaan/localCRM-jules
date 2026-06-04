@@ -5,17 +5,28 @@ using LocalCRM.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using LocalCRM.Application.DTOs;
 
 namespace LocalCRM.Application.Companies.Queries;
 
-public record GetCompaniesQuery : IRequest<List<Company>>;
+public record GetCompaniesQuery : IRequest<List<CompanyDto>>;
 
-public class GetCompaniesQueryHandler : IRequestHandler<GetCompaniesQuery, List<Company>>
+public class GetCompaniesQueryHandler : IRequestHandler<GetCompaniesQuery, List<CompanyDto>>
 {
-    // Normally would use a DB context or repository here
-    // For now, this is a placeholder to show structure
-    public Task<List<Company>> Handle(GetCompaniesQuery request, CancellationToken cancellationToken)
+    private readonly IRepository<Company> _repository;
+    private readonly IMapper _mapper;
+
+    public GetCompaniesQueryHandler(IRepository<Company> repository, IMapper mapper)
     {
-        return Task.FromResult(new List<Company>());
+        _repository = repository;
+        _mapper = mapper;
+    }
+
+    public async Task<List<CompanyDto>> Handle(GetCompaniesQuery request, CancellationToken cancellationToken)
+    {
+        var entities = await _repository.GetAllAsync();
+        // Filter out deleted in the repository or here if not using Global Query Filters
+        return _mapper.Map<List<CompanyDto>>(entities.Where(c => !c.IsDeleted).ToList());
     }
 }

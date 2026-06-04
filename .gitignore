@@ -1,3 +1,21 @@
+# Build artifacts
+**/[Bb]in/
+**/[Oo]bj/
+
+# IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# User-specific files
+*.rsuser
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode,rider,webstorm+all,angular,aspnetcore
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,visualstudiocode,rider,webstorm+all,angular,aspnetcore
 
@@ -43,6 +61,13 @@ e2e/*.map
 *.userosscache
 *.sln.docstates
 
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Log files
+*.log
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
