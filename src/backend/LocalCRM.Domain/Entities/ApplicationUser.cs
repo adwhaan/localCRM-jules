@@ -14,3 +14,17 @@ public class ApplicationUser : IdentityUser<int>
 public class ApplicationRole : IdentityRole<int>
 {
 }
+
+public class Permission
+{
+    public int PermissionId { get; set; }
+    public string PermissionName { get; set; } = string.Empty;
+}
+
+public class RolePermissionLink
+{
+    public int RoleId { get; set; }
+    public ApplicationRole Role { get; set; } = null!;
+    public int PermissionId { get; set; }
+    public Permission Permission { get; set; } = null!;
+}

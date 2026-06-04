@@ -22,6 +22,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<Setting> Settings => Set<Setting>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<RolePermissionLink> RolePermissionLinks => Set<RolePermissionLink>();
 
     public DbSet<CompanyContactLink> CompanyContactLinks => Set<CompanyContactLink>();
     public DbSet<CompanyNoteLink> CompanyNoteLinks => Set<CompanyNoteLink>();
@@ -72,6 +74,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         builder.Entity<EngagementDocumentLink>()
             .HasKey(e => new { e.EngagementId, e.DocumentId });
 
+        builder.Entity<RolePermissionLink>()
+            .HasKey(r => new { r.RoleId, r.PermissionId });
+
         // Naming conventions and defaults
         builder.Entity<Company>().ToTable("companies");
         builder.Entity<Contact>().ToTable("contacts");
@@ -84,6 +89,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         builder.Entity<Setting>().ToTable("settings");
         builder.Entity<AuditLog>().ToTable("audit_logs");
         builder.Entity<RefreshToken>().ToTable("refresh_tokens");
+        builder.Entity<Permission>().ToTable("permissions");
+        builder.Entity<RolePermissionLink>().ToTable("role_permissions_link");
 
         builder.Entity<CompanyContactLink>().ToTable("company_contacts_link");
         builder.Entity<CompanyNoteLink>().ToTable("company_notes_link");
