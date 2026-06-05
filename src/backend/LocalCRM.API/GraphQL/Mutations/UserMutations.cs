@@ -16,6 +16,17 @@ public class UserMutations
         return await mediator.Send(command);
     }
 
+    public async Task<UserDto> UpdateUser(UpdateUserCommand command, [Service] IMediator mediator)
+    {
+        return await mediator.Send(command);
+    }
+
+    public async Task<MutationResult> DeleteUser(int id, [Service] IMediator mediator)
+    {
+        await mediator.Send(new DeleteUserCommand(id));
+        return new MutationResult(true, id);
+    }
+
     public async Task<MutationResult> DisableUser(int id, [Service] IMediator mediator)
     {
         await mediator.Send(new DisableUserCommand(id));

@@ -19,9 +19,16 @@ public class Program
 
         // Configuration
         var jwtKey = builder.Configuration["Jwt:Key"];
-        if (string.IsNullOrEmpty(jwtKey) && !args.Contains("--init"))
+        if (string.IsNullOrEmpty(jwtKey))
         {
-             jwtKey = "placeholder_key_at_least_32_characters_long_for_development";
+            if (builder.Environment.IsDevelopment())
+            {
+                jwtKey = "placeholder_key_at_least_32_characters_long_for_development";
+            }
+            else
+            {
+                throw new InvalidOperationException("Jwt:Key is missing from configuration.");
+            }
         }
 
         // Add services
@@ -48,8 +55,20 @@ public class Program
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = builder.Configuration["Jwt:Issuer"],
                 ValidAudience = builder.Configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey ?? "placeholder_key_at_least_32_characters_long_for_development"))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
             };
+        });
+
+        // Configure CORS for Blazor WASM
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("BlazorClient", policy =>
+            {
+                policy.WithOrigins(builder.Configuration["AllowedOrigins"]?.Split(',') ?? new[] { "http://localhost:5000", "https://localhost:5001" })
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
         });
 
         builder.Services.AddControllers();
@@ -107,6 +126,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseCors("BlazorClient");
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();

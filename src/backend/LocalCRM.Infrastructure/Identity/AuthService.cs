@@ -11,6 +11,7 @@ using AutoMapper;
 using LocalCRM.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Hosting;
 
 namespace LocalCRM.Infrastructure.Identity;
 
@@ -21,19 +22,22 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
     private readonly ApplicationDbContext _context;
+    private readonly IHostEnvironment _environment;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IConfiguration configuration,
         IMapper mapper,
-        ApplicationDbContext context)
+        ApplicationDbContext context,
+        IHostEnvironment environment)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _configuration = configuration;
         _mapper = mapper;
         _context = context;
+        _environment = environment;
     }
 
     public async Task<AuthResponse?> LoginAsync(string username, string password)
@@ -127,7 +131,19 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(ApplicationUser user, string sessionId)
     {
-        var jwtKey = _configuration["Jwt:Key"] ?? "placeholder_key_at_least_32_characters_long_for_development";
+        var jwtKey = _configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            if (_environment.IsDevelopment())
+            {
+                jwtKey = "placeholder_key_at_least_32_characters_long_for_development";
+            }
+            else
+            {
+                throw new InvalidOperationException("Jwt:Key is missing from configuration.");
+            }
+        }
+
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 

@@ -1,6 +1,7 @@
 @page "/search"
 @using MudBlazor
 @using LocalCRM.Blazor.Models
+@inject HttpClient HttpClient
 
 <PageTitle>Search Results</PageTitle>
 
@@ -45,14 +46,14 @@ else
             return;
         }
 
-        // Mocking search result for now
-        await Task.Delay(300);
-        _results = new List<SearchResultDto>
+        try
         {
-            new SearchResultDto { Id = 1, EntityType = "Company", Title = "Acme Corp", Subtitle = "London" },
-            new SearchResultDto { Id = 2, EntityType = "Contact", Title = "John Doe", Subtitle = "Acme Corp" },
-            new SearchResultDto { Id = 3, EntityType = "Engagement", Title = "Project Phoenix", Subtitle = "Acme Corp" }
-        }.Where(r => r.Title.Contains(Term, StringComparison.OrdinalIgnoreCase) || r.Subtitle?.Contains(Term, StringComparison.OrdinalIgnoreCase) == true).ToList();
+            _results = await HttpClient.GetFromJsonAsync<List<SearchResultDto>>($"api/search?term={Uri.EscapeDataString(Term)}");
+        }
+        catch
+        {
+            _results = new List<SearchResultDto>();
+        }
     }
 
     private string GetIcon(string type) => type switch
