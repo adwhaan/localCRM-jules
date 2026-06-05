@@ -1,0 +1,49 @@
+using Microsoft.AspNetCore.Mvc;
+using LocalCRM.Application.Contacts.Queries;
+using LocalCRM.Application.Contacts.Commands;
+using LocalCRM.Application.DTOs;
+
+namespace LocalCRM.API.Controllers;
+
+public class ContactsController : ApiControllerBase
+{
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<ContactDto>>> Get([FromQuery] int offset = 0, [FromQuery] int limit = 10)
+    {
+        return await Mediator.Send(new GetPagedContactsQuery(offset, limit));
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ContactDto>> GetById(int id)
+    {
+        var result = await Mediator.Send(new GetContactByIdQuery(id));
+        if (result == null) return NotFound();
+        return result;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<ContactDto>> Create(CreateContactCommand command)
+    {
+        return await Mediator.Send(command);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ContactDto>> Update(int id, UpdateContactCommand command)
+    {
+        // Validation check for ID mismatch if needed
+        return await Mediator.Send(command);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        await Mediator.Send(new SoftDeleteContactCommand(id));
+        return NoContent();
+    }
+
+    [HttpPost("{id}/restore")]
+    public async Task<ActionResult<ContactDto>> Restore(int id)
+    {
+        return await Mediator.Send(new RestoreContactCommand(id));
+    }
+}
