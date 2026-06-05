@@ -7,8 +7,18 @@ namespace LocalCRM.API.GraphQL.Queries;
 
 public class EngagementQueries
 {
-    public async Task<List<EngagementDto>> GetEngagements([Service] IMediator mediator)
+    [UseFiltering]
+    [UseSorting]
+    public async Task<PagedResult<EngagementDto>> GetEngagements(
+        int offset = 0,
+        int limit = 10,
+        [Service] IMediator mediator = null!)
     {
-        return await mediator.Send(new GetEngagementsQuery());
+        return await mediator.Send(new GetPagedEngagementsQuery(offset, limit));
+    }
+
+    public async Task<EngagementDto?> GetEngagement(int id, [Service] IMediator mediator = null!)
+    {
+        return await mediator.Send(new GetEngagementByIdQuery(id));
     }
 }

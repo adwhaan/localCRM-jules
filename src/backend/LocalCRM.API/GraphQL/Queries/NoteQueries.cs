@@ -7,8 +7,18 @@ namespace LocalCRM.API.GraphQL.Queries;
 
 public class NoteQueries
 {
-    public async Task<List<NoteDto>> GetNotes([Service] IMediator mediator)
+    [UseFiltering]
+    [UseSorting]
+    public async Task<PagedResult<NoteDto>> GetNotes(
+        int offset = 0,
+        int limit = 10,
+        [Service] IMediator mediator = null!)
     {
-        return await mediator.Send(new GetNotesQuery());
+        return await mediator.Send(new GetPagedNotesQuery(offset, limit));
+    }
+
+    public async Task<NoteDto?> GetNote(int id, [Service] IMediator mediator = null!)
+    {
+        return await mediator.Send(new GetNoteByIdQuery(id));
     }
 }

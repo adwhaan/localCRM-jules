@@ -2,6 +2,7 @@ using HotChocolate;
 using LocalCRM.Application.Contacts.Commands;
 using LocalCRM.Application.DTOs;
 using MediatR;
+using LocalCRM.API.GraphQL.Common;
 
 namespace LocalCRM.API.GraphQL.Mutations;
 
@@ -17,14 +18,27 @@ public class ContactMutations
         return await mediator.Send(command);
     }
 
-    public async Task<bool> DeleteContact(int id, [Service] IMediator mediator)
+    public async Task<MutationResult> DeleteContact(int id, [Service] IMediator mediator)
     {
         await mediator.Send(new SoftDeleteContactCommand(id));
-        return true;
+        return new MutationResult(true, id);
     }
 
-    public async Task<ContactDto> RestoreContact(int id, [Service] IMediator mediator)
+    public async Task<MutationResult> RestoreContact(int id, [Service] IMediator mediator)
     {
-        return await mediator.Send(new RestoreContactCommand(id));
+        await mediator.Send(new RestoreContactCommand(id));
+        return new MutationResult(true, id);
+    }
+
+    public async Task<MutationResult> BulkDeleteContacts(List<int> ids, [Service] IMediator mediator)
+    {
+        await mediator.Send(new BulkDeleteContactsCommand(ids));
+        return new MutationResult(true);
+    }
+
+    public async Task<MutationResult> BulkRestoreContacts(List<int> ids, [Service] IMediator mediator)
+    {
+        await mediator.Send(new BulkRestoreContactsCommand(ids));
+        return new MutationResult(true);
     }
 }

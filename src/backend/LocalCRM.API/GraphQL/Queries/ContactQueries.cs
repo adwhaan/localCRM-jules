@@ -7,8 +7,28 @@ namespace LocalCRM.API.GraphQL.Queries;
 
 public class ContactQueries
 {
-    public async Task<List<ContactDto>> GetContacts([Service] IMediator mediator)
+    [UseFiltering]
+    [UseSorting]
+    public async Task<PagedResult<ContactDto>> GetContacts(
+        int offset = 0,
+        int limit = 10,
+        [Service] IMediator mediator = null!)
     {
-        return await mediator.Send(new GetContactsQuery());
+        return await mediator.Send(new GetPagedContactsQuery(offset, limit));
+    }
+
+    public async Task<ContactDto?> GetContact(int id, [Service] IMediator mediator = null!)
+    {
+        return await mediator.Send(new GetContactByIdQuery(id));
+    }
+
+    [UseFiltering]
+    [UseSorting]
+    public async Task<PagedResult<ContactDto>> GetDeletedContacts(
+        int offset = 0,
+        int limit = 10,
+        [Service] IMediator mediator = null!)
+    {
+        return await mediator.Send(new GetPagedContactsQuery(offset, limit, true));
     }
 }

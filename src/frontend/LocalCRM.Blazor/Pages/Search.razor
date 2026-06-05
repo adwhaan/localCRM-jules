@@ -1,0 +1,65 @@
+@page "/search"
+@using MudBlazor
+@using LocalCRM.Blazor.Models
+
+<PageTitle>Search Results</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Search Results for "@Term"</MudText>
+
+@if (_results == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else if (!_results.Any())
+{
+    <MudAlert Severity="Severity.Info">No results found for "@Term".</MudAlert>
+}
+else
+{
+    <MudList T="SearchResultDto">
+        @foreach (var result in _results.OrderByDescending(r => r.EntityType == "Engagement"))
+        {
+            <MudListItem Icon="@GetIcon(result.EntityType)">
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.subtitle1">@result.Title</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@result.EntityType - @result.Subtitle</MudText>
+                </div>
+            </MudListItem>
+            <MudDivider />
+        }
+    </MudList>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Term { get; set; } = "";
+
+    private List<SearchResultDto>? _results;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Term))
+        {
+            _results = new List<SearchResultDto>();
+            return;
+        }
+
+        // Mocking search result for now
+        await Task.Delay(300);
+        _results = new List<SearchResultDto>
+        {
+            new SearchResultDto { Id = 1, EntityType = "Company", Title = "Acme Corp", Subtitle = "London" },
+            new SearchResultDto { Id = 2, EntityType = "Contact", Title = "John Doe", Subtitle = "Acme Corp" },
+            new SearchResultDto { Id = 3, EntityType = "Engagement", Title = "Project Phoenix", Subtitle = "Acme Corp" }
+        }.Where(r => r.Title.Contains(Term, StringComparison.OrdinalIgnoreCase) || r.Subtitle?.Contains(Term, StringComparison.OrdinalIgnoreCase) == true).ToList();
+    }
+
+    private string GetIcon(string type) => type switch
+    {
+        "Engagement" => Icons.Material.Filled.Handshake,
+        "Company" => Icons.Material.Filled.Business,
+        "Contact" => Icons.Material.Filled.Person,
+        _ => Icons.Material.Filled.Search
+    };
+}
