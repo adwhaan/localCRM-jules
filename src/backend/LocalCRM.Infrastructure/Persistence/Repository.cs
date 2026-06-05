@@ -27,6 +27,11 @@ public class Repository<T> : IRepository<T> where T : class
         return await _dbSet.ToListAsync();
     }
 
+    public IQueryable<T> Query()
+    {
+        return _dbSet.AsQueryable();
+    }
+
     public async Task AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
@@ -42,6 +47,12 @@ public class Repository<T> : IRepository<T> where T : class
     public async Task DeleteAsync(T entity)
     {
         _dbSet.Remove(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task BulkUpdateAsync(IEnumerable<T> entities)
+    {
+        _dbSet.UpdateRange(entities);
         await _context.SaveChangesAsync();
     }
 }

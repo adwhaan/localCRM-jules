@@ -3,6 +3,7 @@ using AutoMapper;
 using LocalCRM.Application.Interfaces;
 using LocalCRM.Domain.Entities;
 using LocalCRM.Application.DTOs;
+using LocalCRM.Application.Common.Exceptions;
 
 namespace LocalCRM.Application.Companies.Commands;
 
@@ -13,6 +14,7 @@ public record UpdateCompanyCommand : IRequest<CompanyDto>
     public string City { get; init; } = string.Empty;
     public string CompanyType { get; init; } = string.Empty;
     public int Rating { get; init; }
+    public DateTime UpdatedAt { get; init; }
 }
 
 public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, CompanyDto>
@@ -34,6 +36,12 @@ public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand,
     {
         var entity = await _repository.GetByIdAsync(request.CompanyId);
         if (entity == null || entity.IsDeleted) throw new Exception("Company not found");
+
+        // Optimistic Concurrency check
+        if (entity.UpdatedAt.HasValue && entity.UpdatedAt.Value != request.UpdatedAt)
+        {
+             throw new ConcurrencyException("The record has been modified by another user.");
+        }
 
         entity.Name = request.Name;
         entity.City = request.City;

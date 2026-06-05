@@ -6,27 +6,32 @@ using LocalCRM.Application.DTOs;
 
 namespace LocalCRM.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class CompaniesController : ControllerBase
+public partial class CompaniesController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public CompaniesController(IMediator mediator)
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<CompanyDto>>> Get([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
-        _mediator = mediator;
+        return await Mediator.Send(new GetPagedCompaniesQuery(offset, limit));
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<CompanyDto>>> Get()
+    [HttpGet("deleted")]
+    public async Task<ActionResult<PagedResult<CompanyDto>>> GetDeleted([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
-        return await _mediator.Send(new GetCompaniesQuery());
+        return await Mediator.Send(new GetPagedCompaniesQuery(offset, limit, true));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<CompanyDto>> GetById(int id)
     {
-        var result = await _mediator.Send(new GetCompanyByIdQuery(id));
+        var result = await Mediator.Send(new GetCompanyByIdQuery(id));
+        if (result == null) return NotFound();
+        return result;
+    }
+
+    [HttpGet("by-ref/{companyRef}")]
+    public async Task<ActionResult<CompanyDto>> GetByRef(string companyRef)
+    {
+        var result = await Mediator.Send(new GetCompanyByRefQuery(companyRef));
         if (result == null) return NotFound();
         return result;
     }
@@ -34,26 +39,33 @@ public class CompaniesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<CompanyDto>> Create(CreateCompanyCommand command)
     {
-        return await _mediator.Send(command);
+        return await Mediator.Send(command);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<CompanyDto>> Update(int id, UpdateCompanyCommand command)
     {
         if (id != command.CompanyId) return BadRequest();
-        return await _mediator.Send(command);
+        return await Mediator.Send(command);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await _mediator.Send(new SoftDeleteCompanyCommand(id));
+        await Mediator.Send(new SoftDeleteCompanyCommand(id));
         return NoContent();
     }
 
     [HttpPost("{id}/restore")]
     public async Task<ActionResult<CompanyDto>> Restore(int id)
     {
-        return await _mediator.Send(new RestoreCompanyCommand(id));
+        return await Mediator.Send(new RestoreCompanyCommand(id));
+    }
+
+    [HttpPost("bulk-delete")]
+    public async Task<ActionResult> BulkDelete(BulkDeleteCompaniesCommand command)
+    {
+        await Mediator.Send(command);
+        return NoContent();
     }
 }
