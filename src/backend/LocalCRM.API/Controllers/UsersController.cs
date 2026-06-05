@@ -3,17 +3,11 @@ using LocalCRM.Application.DTOs;
 using LocalCRM.Application.Users.Commands;
 using LocalCRM.Application.Users.Queries;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< HEAD
-
-namespace LocalCRM.API.Controllers;
-
-=======
 using Microsoft.AspNetCore.Authorization;
 
 namespace LocalCRM.API.Controllers;
 
 [Authorize(Roles = "Administrator")]
->>>>>>> feature-backend-12855298858282564638
 [ApiController]
 [Route("api/[controller]")]
 public class UsersController : ApiControllerBase

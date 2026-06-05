@@ -1,10 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-<<<<<<< HEAD
-
-namespace LocalCRM.API.Controllers;
-
-=======
 using Microsoft.AspNetCore.Authorization;
 
 namespace LocalCRM.API.Controllers;

@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 using HotChocolate.Authorization;
->>>>>>> feature-backend-12855298858282564638
 using HotChocolate;
 using LocalCRM.Application.Interactions.Queries;
 using LocalCRM.Application.DTOs;
@@ -9,10 +6,7 @@ using MediatR;
 
 namespace LocalCRM.API.GraphQL.Queries;
 
-<<<<<<< HEAD
-=======
 [Authorize]
->>>>>>> feature-backend-12855298858282564638
 public class InteractionQueries
 {
     [UseFiltering]
