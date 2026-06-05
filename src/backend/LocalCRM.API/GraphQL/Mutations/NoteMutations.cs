@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+using HotChocolate.Authorization;
+>>>>>>> feature-backend-12855298858282564638
 using HotChocolate;
 using LocalCRM.Application.Notes.Commands;
 using LocalCRM.Application.DTOs;
@@ -6,6 +10,10 @@ using LocalCRM.API.GraphQL.Common;
 
 namespace LocalCRM.API.GraphQL.Mutations;
 
+<<<<<<< HEAD
+=======
+[Authorize]
+>>>>>>> feature-backend-12855298858282564638
 public class NoteMutations
 {
     public async Task<NoteDto> CreateNote(CreateNoteCommand command, [Service] IMediator mediator)

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+using HotChocolate.Authorization;
+>>>>>>> feature-backend-12855298858282564638
 using HotChocolate;
 using LocalCRM.Application.DTOs;
 using LocalCRM.Application.Interfaces;

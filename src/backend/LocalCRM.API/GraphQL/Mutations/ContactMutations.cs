@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+using HotChocolate.Authorization;
+>>>>>>> feature-backend-12855298858282564638
 using HotChocolate;
 using LocalCRM.Application.Contacts.Commands;
 using LocalCRM.Application.DTOs;
@@ -6,6 +10,10 @@ using LocalCRM.API.GraphQL.Common;
 
 namespace LocalCRM.API.GraphQL.Mutations;
 
+<<<<<<< HEAD
+=======
+[Authorize]
+>>>>>>> feature-backend-12855298858282564638
 public class ContactMutations
 {
     public async Task<ContactDto> CreateContact(CreateContactCommand command, [Service] IMediator mediator)

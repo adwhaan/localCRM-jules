@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using LocalCRM.API.GraphQL.Queries;
 using LocalCRM.API.GraphQL.Mutations;
 using LocalCRM.Application;
@@ -8,6 +11,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace LocalCRM.API;
 

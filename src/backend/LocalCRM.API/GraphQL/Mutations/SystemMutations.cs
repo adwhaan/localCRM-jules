@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+using HotChocolate.Authorization;
+>>>>>>> feature-backend-12855298858282564638
 using HotChocolate;
 using LocalCRM.Domain.Entities;
 using LocalCRM.Application.Interfaces;
@@ -6,6 +10,10 @@ using LocalCRM.API.GraphQL.Common;
 
 namespace LocalCRM.API.GraphQL.Mutations;
 
+<<<<<<< HEAD
+=======
+[Authorize]
+>>>>>>> feature-backend-12855298858282564638
 public class SettingMutations
 {
     public async Task<Setting> UpdateSetting(string key, string value, [Service] IRepository<Setting> repository)
@@ -25,6 +33,10 @@ public class SettingMutations
     }
 }
 
+<<<<<<< HEAD
+=======
+[Authorize]
+>>>>>>> feature-backend-12855298858282564638
 public class RoleMutations
 {
     public async Task<MutationResult> AssignPermissionToRole(int roleId, int permissionId, [Service] IRepository<RolePermissionLink> repository)
