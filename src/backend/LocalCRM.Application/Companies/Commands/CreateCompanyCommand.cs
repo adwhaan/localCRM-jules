@@ -33,12 +33,14 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
     private readonly IRepository<Company> _repository;
     private readonly IMapper _mapper;
     private readonly IAuditService _audit;
+    private readonly ICurrentUserService _currentUser;
 
-    public CreateCompanyCommandHandler(IRepository<Company> repository, IMapper mapper, IAuditService audit)
+    public CreateCompanyCommandHandler(IRepository<Company> repository, IMapper mapper, IAuditService audit, ICurrentUserService currentUser)
     {
         _repository = repository;
         _mapper = mapper;
         _audit = audit;
+        _currentUser = currentUser;
     }
 
     public async Task<CompanyDto> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
@@ -50,7 +52,7 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
             City = request.City,
             CompanyType = request.CompanyType,
             Rating = request.Rating,
-            CreatedBy = "system" // Should come from ICurrentUser interface later
+            CreatedBy = _currentUser.Username ?? "system"
         };
 
         await _repository.AddAsync(entity);

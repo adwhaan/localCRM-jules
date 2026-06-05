@@ -26,15 +26,12 @@ public class RestoreContactCommandHandler : IRequestHandler<RestoreContactComman
     public async Task<ContactDto> Handle(RestoreContactCommand request, CancellationToken cancellationToken)
     {
         var entity = await _repository.GetByIdAsync(request.Id);
-        if (entity == null || !entity.IsDeleted) throw new Exception("Contact not found or not deleted");
-
+        if (entity == null || !entity.IsDeleted) throw new Exception("Not found or not deleted");
         entity.IsDeleted = false;
         entity.DeletedAt = null;
         entity.UpdatedBy = _currentUser.Username ?? "system";
-
         await _repository.UpdateAsync(entity);
-        await _audit.LogAsync("contacts", entity.ContactId, "RESTORE", entity.UpdatedBy);
-
+        await _audit.LogAsync("Contacts", entity.ContactId, "RESTORE", entity.UpdatedBy);
         return _mapper.Map<ContactDto>(entity);
     }
 }

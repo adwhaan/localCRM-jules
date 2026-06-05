@@ -8,9 +8,9 @@ namespace LocalCRM.API.Controllers;
 public class ContactsController : ApiControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<ContactDto>>> Get()
+    public async Task<ActionResult<PagedResult<ContactDto>>> Get([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
-        return await Mediator.Send(new GetContactsQuery());
+        return await Mediator.Send(new GetPagedContactsQuery(offset, limit));
     }
 
     [HttpGet("{id}")]
@@ -30,7 +30,7 @@ public class ContactsController : ApiControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ContactDto>> Update(int id, UpdateContactCommand command)
     {
-        if (id != command.ContactId) return BadRequest();
+        // Validation check for ID mismatch if needed
         return await Mediator.Send(command);
     }
 

@@ -23,12 +23,10 @@ public class SoftDeleteContactCommandHandler : IRequestHandler<SoftDeleteContact
     {
         var entity = await _repository.GetByIdAsync(request.Id);
         if (entity == null || entity.IsDeleted) return;
-
         entity.IsDeleted = true;
         entity.DeletedAt = DateTime.UtcNow;
         entity.UpdatedBy = _currentUser.Username ?? "system";
-
         await _repository.UpdateAsync(entity);
-        await _audit.LogAsync("contacts", entity.ContactId, "SOFT_DELETE", entity.UpdatedBy);
+        await _audit.LogAsync("Contacts", entity.ContactId, "SOFT_DELETE", entity.UpdatedBy);
     }
 }
