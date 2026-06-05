@@ -1,0 +1,16 @@
+@using MudBlazor
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+    <MudNavLink Href="/companies" Icon="@Icons.Material.Filled.Business">Companies</MudNavLink>
+    <MudNavLink Href="/contacts" Icon="@Icons.Material.Filled.People">Contacts</MudNavLink>
+    <MudNavLink Href="/engagements" Icon="@Icons.Material.Filled.Handshake">Engagements</MudNavLink>
+
+    <MudDivider Class="my-2" />
+
+    <MudNavGroup Title="Settings" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+        <MudNavLink Href="/users" Icon="@Icons.Material.Filled.Person">User Management</MudNavLink>
+        <MudNavLink Href="/audit" Icon="@Icons.Material.Filled.History">Audit Logs</MudNavLink>
+        <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Build">System Settings</MudNavLink>
+    </MudNavGroup>
+</MudNavMenu>
