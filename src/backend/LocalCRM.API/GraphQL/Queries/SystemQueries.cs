@@ -5,6 +5,8 @@ using LocalCRM.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using LocalCRM.Application.DTOs;
 
+using Tag = LocalCRM.Domain.Entities.Tag;
+
 namespace LocalCRM.API.GraphQL.Queries;
 
 [Authorize]

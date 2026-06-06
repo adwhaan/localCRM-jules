@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Tag = LocalCRM.Domain.Entities.Tag;
+
 namespace LocalCRM.API.Controllers;
 
 [Authorize(Roles = "Administrator")]
