@@ -3,6 +3,7 @@ using AutoMapper;
 using LocalCRM.Application.Interfaces;
 using LocalCRM.Domain.Entities;
 using LocalCRM.Application.DTOs;
+using LocalCRM.Application.Common.Exceptions;
 
 namespace LocalCRM.Application.Contacts.Commands;
 
@@ -13,6 +14,7 @@ public record UpdateContactCommand : IRequest<ContactDto>
     public string LastName { get; init; } = string.Empty;
     public string? Email { get; init; }
     public int Rating { get; init; }
+    public DateTime? UpdatedAt { get; init; }
 }
 
 public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand, ContactDto>
@@ -34,6 +36,11 @@ public class UpdateContactCommandHandler : IRequestHandler<UpdateContactCommand,
     {
         var entity = await _repository.GetByIdAsync(request.ContactId);
         if (entity == null || entity.IsDeleted) throw new Exception("Contact not found");
+
+        if (request.UpdatedAt.HasValue && entity.UpdatedAt.HasValue && request.UpdatedAt.Value != entity.UpdatedAt.Value)
+        {
+            throw new ConcurrencyException("Contact was modified by another user.");
+        }
 
         entity.FirstName = request.FirstName;
         entity.LastName = request.LastName;

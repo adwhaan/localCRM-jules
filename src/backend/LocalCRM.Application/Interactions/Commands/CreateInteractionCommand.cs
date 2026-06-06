@@ -10,6 +10,7 @@ namespace LocalCRM.Application.Interactions.Commands;
 public record CreateInteractionCommand : IRequest<InteractionDto>
 {
     public DateOnly InteractionDate { get; init; }
+    public TimeOnly? InteractionTime { get; init; }
     public string InteractionType { get; init; } = string.Empty;
     public string Subject { get; init; } = string.Empty;
     public bool IsTask { get; init; }
@@ -48,6 +49,7 @@ public class CreateInteractionCommandHandler : IRequestHandler<CreateInteraction
         var entity = new Interaction
         {
             InteractionDate = request.InteractionDate,
+            InteractionTime = request.InteractionTime,
             InteractionType = request.InteractionType,
             Subject = request.Subject,
             IsTask = request.IsTask,

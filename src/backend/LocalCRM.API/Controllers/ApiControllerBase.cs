@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 namespace LocalCRM.API.Controllers;
 
 [Authorize]
->>>>>>> feature-backend-12855298858282564638
 [ApiController]
 [Route("api/[controller]")]
 public abstract class ApiControllerBase : ControllerBase

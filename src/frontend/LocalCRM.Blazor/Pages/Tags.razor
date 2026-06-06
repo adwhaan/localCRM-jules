@@ -1,0 +1,52 @@
+@page "/tags"
+@using MudBlazor
+@using LocalCRM.Blazor.Models
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient HttpClient
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>Tag Management</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Tag Management</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<TagDto>>>(ServerReload))"
+          Hover="true" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">System Tags</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">Add Tag</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Group</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Value</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Group">@context.TagGroup</MudTd>
+        <MudTd DataLabel="Name">@context.TagName</MudTd>
+        <MudTd DataLabel="Value">@context.TagValue</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private async Task<TableData<TagDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
+        {
+            var result = await HttpClient.GetFromJsonAsync<PagedResult<TagDto>>($"api/tags?offset={state.Page * state.PageSize}&limit={state.PageSize}");
+            return new TableData<TagDto> { TotalItems = result?.TotalCount ?? 0, Items = result?.Items ?? new() };
+        }
+        catch
+        {
+            return new TableData<TagDto> { TotalItems = 0, Items = new() };
+        }
+    }
+}

@@ -3,13 +3,14 @@
 @using LocalCRM.Blazor.Services
 @using LocalCRM.Blazor.Models
 @inject ContactService ContactService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Contacts</PageTitle>
 
 <MudText Typo="Typo.h4" Class="mb-4">Contacts</MudText>
 
 <MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<ContactDto>>>(ServerReload))"
-          Hover="true" @ref="_table" Elevation="2">
+          Hover="true" @ref="_table" Elevation="2" OnRowClick="@((TableRowClickEventArgs<ContactDto> e) => NavigateToDetails(e.Item!.ContactId))">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Contacts Directory</MudText>
         <MudSpacer />
@@ -28,7 +29,7 @@
         <MudTd DataLabel="Email">@context.Email</MudTd>
         <MudTd DataLabel="Phone">@context.Phone</MudTd>
         <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" />
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" OnClick="@(() => NavigateToDetails(context.ContactId))" />
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
         </MudTd>
     </RowTemplate>
@@ -44,5 +45,10 @@
     {
         var result = await ContactService.GetContactsAsync(state.Page * state.PageSize, state.PageSize);
         return new TableData<ContactDto> { TotalItems = result.TotalCount, Items = result.Items };
+    }
+
+    private void NavigateToDetails(int id)
+    {
+        NavigationManager.NavigateTo($"/contacts/{id}");
     }
 }

@@ -8,6 +8,8 @@ using LocalCRM.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using HotChocolate.Authorization;
 
+namespace LocalCRM.API.GraphQL.Mutations;
+
 [Authorize]
 public class UserMutations
 {

@@ -30,7 +30,7 @@ public class ContactsController : ApiControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ContactDto>> Update(int id, UpdateContactCommand command)
     {
-        // Validation check for ID mismatch if needed
+        if (id != command.ContactId) return BadRequest("ID mismatch");
         return await Mediator.Send(command);
     }
 

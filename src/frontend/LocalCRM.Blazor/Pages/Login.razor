@@ -39,12 +39,16 @@
         }
 
         _loading = true;
-        var success = await AuthService.Login(_username, _password);
+        var result = await AuthService.Login(_username, _password);
         _loading = false;
 
-        if (success)
+        if (result.Succeeded)
         {
             NavigationManager.NavigateTo("/");
+        }
+        else if (result.MustChangePassword)
+        {
+            NavigationManager.NavigateTo("/change-password");
         }
         else
         {

@@ -3,7 +3,6 @@ using LocalCRM.Application.Users.Queries;
 using LocalCRM.Application.DTOs;
 using MediatR;
 using System.Security.Claims;
-
 using HotChocolate.Authorization;
 
 namespace LocalCRM.API.GraphQL.Queries;

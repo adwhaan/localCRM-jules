@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Json;
+using LocalCRM.Blazor.Models;
 
 namespace LocalCRM.Blazor.Services;
 
@@ -19,20 +20,25 @@ public class AuthService
         _localStorage = localStorage;
     }
 
-    public async Task<bool> Login(string username, string password)
+    public async Task<AuthResult> Login(string username, string password)
     {
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", new { Username = username, Password = password });
 
         if (!response.IsSuccessStatusCode)
         {
-            return false;
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                 var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                 if (error?.Code == "password_change_required") return AuthResult.PasswordChangeRequired();
+            }
+            return AuthResult.Failure();
         }
 
         var result = await response.Content.ReadFromJsonAsync<LoginResult>();
 
         if (result == null || string.IsNullOrEmpty(result.AccessToken))
         {
-            return false;
+            return AuthResult.Failure();
         }
 
         await _localStorage.SetItemAsync("authToken", result.AccessToken);
@@ -42,7 +48,7 @@ public class AuthService
 
         _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", result.AccessToken);
 
-        return true;
+        return AuthResult.Success();
     }
 
     public async Task Logout()
@@ -54,8 +60,24 @@ public class AuthService
     }
 }
 
+public class AuthResult
+{
+    public bool Succeeded { get; set; }
+    public bool MustChangePassword { get; set; }
+
+    public static AuthResult Success() => new() { Succeeded = true };
+    public static AuthResult Failure() => new() { Succeeded = false };
+    public static AuthResult PasswordChangeRequired() => new() { Succeeded = false, MustChangePassword = true };
+}
+
 public class LoginResult
 {
     public string AccessToken { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class ErrorResponse
+{
+    public string Code { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
 }

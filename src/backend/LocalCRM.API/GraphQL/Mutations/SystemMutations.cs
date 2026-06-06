@@ -27,10 +27,7 @@ public class SettingMutations
     }
 }
 
-<<<<<<< HEAD
-=======
 [Authorize]
->>>>>>> feature-backend-12855298858282564638
 public class RoleMutations
 {
     public async Task<MutationResult> AssignPermissionToRole(int roleId, int permissionId, [Service] IRepository<RolePermissionLink> repository)

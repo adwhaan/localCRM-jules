@@ -2,6 +2,7 @@
 @using MudBlazor
 @using LocalCRM.Blazor.Models
 @inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
 
 <PageTitle>Search Results</PageTitle>
 
@@ -20,7 +21,7 @@ else
     <MudList T="SearchResultDto">
         @foreach (var result in _results.OrderByDescending(r => r.EntityType == "Engagement"))
         {
-            <MudListItem Icon="@GetIcon(result.EntityType)">
+            <MudListItem Icon="@GetIcon(result.EntityType)" OnClick="@(() => NavigateToResult(result))">
                 <div class="d-flex flex-column">
                     <MudText Typo="Typo.subtitle1">@result.Title</MudText>
                     <MudText Typo="Typo.body2" Color="Color.Secondary">@result.EntityType - @result.Subtitle</MudText>
@@ -61,6 +62,22 @@ else
         "Engagement" => Icons.Material.Filled.Handshake,
         "Company" => Icons.Material.Filled.Business,
         "Contact" => Icons.Material.Filled.Person,
+        "Interaction" => Icons.Material.Filled.Chat,
+        "Note" => Icons.Material.Filled.Note,
+        "Document" => Icons.Material.Filled.Description,
         _ => Icons.Material.Filled.Search
     };
+
+    private void NavigateToResult(SearchResultDto result)
+    {
+        var path = result.EntityType.ToLower() switch
+        {
+            "company" => $"companies/{result.Id}",
+            "contact" => $"contacts/{result.Id}",
+            "engagement" => $"engagements/{result.Id}",
+            _ => null
+        };
+
+        if (path != null) NavigationManager.NavigateTo(path);
+    }
 }
