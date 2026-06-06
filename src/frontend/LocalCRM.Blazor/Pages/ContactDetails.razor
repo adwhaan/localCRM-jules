@@ -1,0 +1,77 @@
+@page "/contacts/{Id:int}"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject ContactService ContactService
+@inject ISnackbar Snackbar
+
+<PageTitle>Contact Details</PageTitle>
+
+@if (_contact == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h4" Class="mb-4">@_contact.FirstName @_contact.LastName</MudText>
+
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <MudPaper Elevation="2" Class="pa-6">
+                <div class="d-flex align-center mb-4">
+                    <MudText Typo="Typo.h6">Contact Information</MudText>
+                    <MudSpacer />
+                    <MudIconButton Icon="@(_editMode ? Icons.Material.Filled.Save : Icons.Material.Filled.Edit)"
+                                   Color="Color.Primary"
+                                   OnClick="ToggleEdit" />
+                </div>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_contact.FirstName" Label="First Name" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_contact.LastName" Label="Last Name" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_contact.Email" Label="Email" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_contact.Phone" Label="Phone" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudPaper Elevation="2" Class="pa-6">
+                <MudText Typo="Typo.h6" Class="mb-4">History</MudText>
+                <MudList T="string">
+                    <MudListItem Icon="@Icons.Material.Filled.Chat">Last Interactions</MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Business">Employment History</MudListItem>
+                </MudList>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private ContactDto? _contact;
+    private bool _editMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ContactService.GetContactsAsync(0, 1000);
+        _contact = result.Items.FirstOrDefault(c => c.ContactId == Id);
+    }
+
+    private void ToggleEdit()
+    {
+        if (_editMode)
+        {
+            Snackbar.Add("Changes saved (simulated)", Severity.Success);
+        }
+        _editMode = !_editMode;
+    }
+}

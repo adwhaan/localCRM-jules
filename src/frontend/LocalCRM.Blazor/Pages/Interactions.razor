@@ -1,0 +1,47 @@
+@page "/interactions"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject InteractionService InteractionService
+
+<PageTitle>Interactions</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Interactions</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<InteractionDto>>>(ServerReload))"
+          Hover="true" @ref="_table" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Communication Log</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">Log Interaction</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Date</MudTh>
+        <MudTh>Subject</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Date">@context.InteractionDate.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Subject">@context.Subject</MudTd>
+        <MudTd DataLabel="Type">@context.InteractionType</MudTd>
+        <MudTd DataLabel="Status">@context.State</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Info" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<InteractionDto> _table = null!;
+
+    private async Task<TableData<InteractionDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        var result = await InteractionService.GetInteractionsAsync(state.Page * state.PageSize, state.PageSize);
+        return new TableData<InteractionDto> { TotalItems = result.TotalCount, Items = result.Items };
+    }
+}

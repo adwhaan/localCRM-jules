@@ -1,0 +1,46 @@
+@page "/documents"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject DocumentService DocumentService
+
+<PageTitle>Documents</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Documents</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<DocumentDto>>>(ServerReload))"
+          Hover="true" @ref="_table" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Document Repository</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile">Upload Document</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Ref</MudTh>
+        <MudTh>Subject</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Ref">@context.DocumentRef</MudTd>
+        <MudTd DataLabel="Subject">@context.Subject</MudTd>
+        <MudTd DataLabel="Type">@context.DocumentType</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.FileDownload" Size="Size.Small" Color="Color.Info" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<DocumentDto> _table = null!;
+
+    private async Task<TableData<DocumentDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        var result = await DocumentService.GetDocumentsAsync(state.Page * state.PageSize, state.PageSize);
+        return new TableData<DocumentDto> { TotalItems = result.TotalCount, Items = result.Items };
+    }
+}
