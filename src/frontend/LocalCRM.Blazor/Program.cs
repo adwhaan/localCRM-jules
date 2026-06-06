@@ -25,5 +25,11 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredServ
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CompanyService>();
+builder.Services.AddScoped<ContactService>();
+builder.Services.AddScoped<EngagementService>();
+builder.Services.AddScoped<InteractionService>();
+builder.Services.AddScoped<NoteService>();
+builder.Services.AddScoped<DocumentService>();
 
 await builder.Build().RunAsync();

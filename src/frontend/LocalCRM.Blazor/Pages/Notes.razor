@@ -1,0 +1,46 @@
+@page "/notes"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject NoteService NoteService
+
+<PageTitle>Notes</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Notes</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<NoteDto>>>(ServerReload))"
+          Hover="true" @ref="_table" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">General Notes</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.NoteAdd">New Note</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Subject</MudTh>
+        <MudTh>Created By</MudTh>
+        <MudTh>Date</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Subject">@context.Subject</MudTd>
+        <MudTd DataLabel="Created By">@context.CreatedBy</MudTd>
+        <MudTd DataLabel="Date">@context.CreatedAt.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<NoteDto> _table = null!;
+
+    private async Task<TableData<NoteDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        var result = await NoteService.GetNotesAsync(state.Page * state.PageSize, state.PageSize);
+        return new TableData<NoteDto> { TotalItems = result.TotalCount, Items = result.Items };
+    }
+}
