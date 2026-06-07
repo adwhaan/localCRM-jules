@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
 
 namespace LocalCRM.API;
 
@@ -65,7 +64,7 @@ public class Program
         {
             options.AddPolicy("BlazorClient", policy =>
             {
-                policy.WithOrigins(builder.Configuration["AllowedOrigins"]?.Split(',') ?? new[] { "http://localhost:5000", "https://localhost:5001" })
+                policy.WithOrigins(builder.Configuration["AllowedOrigins"]?.Split(',') ?? new[] { "http://localhost:5264", "https://localhost:5265" })
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
@@ -78,7 +77,6 @@ public class Program
 
         builder.Services
             .AddGraphQLServer()
-            .AddAuthorization()
             .AddQueryType(q => q.Name("Query"))
                 .AddType<CompanyQueries>()
                 .AddType<ContactQueries>()
