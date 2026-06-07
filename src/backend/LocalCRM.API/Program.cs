@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LocalCRM.API;
 
@@ -77,6 +78,7 @@ public class Program
 
         builder.Services
             .AddGraphQLServer()
+            .AddAuthorization()
             .AddQueryType(q => q.Name("Query"))
                 .AddType<CompanyQueries>()
                 .AddType<ContactQueries>()
@@ -89,6 +91,7 @@ public class Program
                 .AddType<SearchQueries>()
                 .AddType<RoleQueries>()
                 .AddType<PermissionQueries>()
+                .AddType<SystemQueries>()
                 .AddType<SettingQueries>()
             .AddMutationType(m => m.Name("Mutation"))
                 .AddType<CompanyMutations>()
@@ -154,7 +157,9 @@ public class Program
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
-            var password = args.FirstOrDefault(a => a.StartsWith("--password="))?.Split('=')[1] ?? "DefaultAdminPassword123!";
+            var passwordArg = args.FirstOrDefault(a => a.StartsWith("--password="));
+            var password = passwordArg != null ? passwordArg.Split('=')[1] : "DefaultAdminPassword123!";
+
             adminUser = new ApplicationUser { UserName = "admin", Email = adminEmail, CreatedBy = "system" };
             var result = await userManager.CreateAsync(adminUser, password);
             if (result.Succeeded) await userManager.AddToRoleAsync(adminUser, "Administrator");

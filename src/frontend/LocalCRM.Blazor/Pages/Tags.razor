@@ -46,7 +46,7 @@
         }
         catch
         {
-            return new TableData<TagDto> { TotalItems = 0, Items = new List<TagDto>().AsEnumerable() };
+            return new TableData<TagDto> { TotalItems = 0, Items = new() };
         }
     }
 }
