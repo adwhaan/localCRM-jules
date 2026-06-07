@@ -47,7 +47,7 @@
         }
         catch
         {
-            return new TableData<AuditLogDto> { TotalItems = 0, Items = new() };
+            return new TableData<AuditLogDto> { TotalItems = 0, Items = new List<AuditLogDto>().AsEnumerable() };
         }
     }
 

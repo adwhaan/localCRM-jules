@@ -56,7 +56,6 @@ public class Program
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = builder.Configuration["Jwt:Issuer"],
                 ValidAudience = builder.Configuration["Jwt:Audience"],
-                ClockSkew = TimeSpan.Zero,,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
             };
         });
@@ -66,7 +65,7 @@ public class Program
         {
             options.AddPolicy("BlazorClient", policy =>
             {
-                policy.WithOrigins(builder.Configuration["AllowedOrigins"]?.Split(',') ?? new[] { "https://localhost:7092", "http://localhost:5264" })
+                policy.WithOrigins(builder.Configuration["AllowedOrigins"]?.Split(',') ?? new[] { "http://localhost:5000", "https://localhost:5001" })
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
