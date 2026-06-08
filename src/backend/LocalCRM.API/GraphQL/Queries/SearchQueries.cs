@@ -7,6 +7,7 @@ using MediatR;
 namespace LocalCRM.API.GraphQL.Queries;
 
 [Authorize]
+[ExtendObjectType("Query")]
 public class SearchQueries
 {
     public async Task<List<SearchResultDto>> Search(string term, [Service] IMediator mediator)

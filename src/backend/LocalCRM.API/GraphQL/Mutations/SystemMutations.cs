@@ -8,6 +8,7 @@ using LocalCRM.API.GraphQL.Common;
 namespace LocalCRM.API.GraphQL.Mutations;
 
 [Authorize]
+[ExtendObjectType("Mutation")]
 public class SettingMutations
 {
     public async Task<Setting> UpdateSetting(string key, string value, [Service] IRepository<Setting> repository)
@@ -28,6 +29,7 @@ public class SettingMutations
 }
 
 [Authorize]
+[ExtendObjectType("Mutation")]
 public class RoleMutations
 {
     public async Task<MutationResult> AssignPermissionToRole(int roleId, int permissionId, [Service] IRepository<RolePermissionLink> repository)

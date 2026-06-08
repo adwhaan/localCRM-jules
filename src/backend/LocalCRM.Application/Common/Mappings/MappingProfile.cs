@@ -16,6 +16,7 @@ public class MappingProfile : Profile
         CreateMap<Document, DocumentDto>().ReverseMap();
         CreateMap<ApplicationUser, UserDto>()
             .ForMember(d => d.Username, opt => opt.MapFrom(s => s.UserName))
-            .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.LockoutEnd == null || s.LockoutEnd < DateTime.UtcNow));
+            .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.LockoutEnd == null || s.LockoutEnd < DateTime.UtcNow))
+            .ForMember(d => d.MustChangePassword, opt => opt.MapFrom(s => s.MustChangePassword));
     }
 }

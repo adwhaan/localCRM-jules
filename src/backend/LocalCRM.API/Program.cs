@@ -130,6 +130,7 @@ public class Program
         app.UseCors("BlazorClient");
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseMiddleware<LocalCRM.API.Middleware.ForcedPasswordChangeMiddleware>();
         app.MapControllers();
         app.MapGraphQL();
 
@@ -143,7 +144,8 @@ public class Program
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
-        await context.Database.EnsureCreatedAsync();
+        // Apply automatic migrations
+        await context.Database.MigrateAsync();
 
         if (!await roleManager.RoleExistsAsync("Administrator"))
             await roleManager.CreateAsync(new ApplicationRole { Name = "Administrator" });

@@ -8,6 +8,7 @@ using LocalCRM.API.GraphQL.Common;
 namespace LocalCRM.API.GraphQL.Mutations;
 
 [Authorize]
+[ExtendObjectType("Mutation")]
 public class NoteMutations
 {
     public async Task<NoteDto> CreateNote(CreateNoteCommand command, [Service] IMediator mediator)

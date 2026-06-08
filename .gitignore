@@ -581,3 +581,12 @@ sync.ffs_db
 **/[Tt]emp/*
 **/[Tt]estResults/*
 **/[Tt]estResults.xml
+*.db
+*.db-wal
+*.db-shm
+build_output.txt
+final_build_check.txt
+queries_list.txt
+mutations_list.txt
+gql_files.txt
+dtos_list.txt

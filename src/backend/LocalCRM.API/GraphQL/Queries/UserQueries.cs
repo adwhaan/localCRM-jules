@@ -8,6 +8,7 @@ using HotChocolate.Authorization;
 namespace LocalCRM.API.GraphQL.Queries;
 
 [Authorize]
+[ExtendObjectType("Query")]
 public class UserQueries
 {
     [Authorize(Roles = new[] { "Administrator" })]
