@@ -1,0 +1,81 @@
+@page "/companies/{Id:int}"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject CompanyService CompanyService
+@inject ISnackbar Snackbar
+
+<PageTitle>Company Details</PageTitle>
+
+@if (_company == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h4" Class="mb-4">@_company.Name</MudText>
+
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <MudPaper Elevation="2" Class="pa-6">
+                <div class="d-flex align-center mb-4">
+                    <MudText Typo="Typo.h6">General Information</MudText>
+                    <MudSpacer />
+                    <MudIconButton Icon="@(_editMode ? Icons.Material.Filled.Save : Icons.Material.Filled.Edit)"
+                                   Color="Color.Primary"
+                                   OnClick="ToggleEdit" />
+                </div>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_company.CompanyRef" Label="Reference" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_company.Name" Label="Name" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_company.City" Label="City" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_company.Country" Label="Country" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_company.CompanyType" Label="Type" ReadOnly="!_editMode" Variant="Variant.Outlined" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudPaper Elevation="2" Class="pa-6">
+                <MudText Typo="Typo.h6" Class="mb-4">Links</MudText>
+                <MudList T="string">
+                    <MudListItem Icon="@Icons.Material.Filled.People">Related Contacts</MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Handshake">Active Engagements</MudListItem>
+                </MudList>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private CompanyDto? _company;
+    private bool _editMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // For scaffolding, we fetch all and find the one. Real app would have GetById.
+        var result = await CompanyService.GetCompaniesAsync(0, 1000);
+        _company = result.Items.FirstOrDefault(c => c.CompanyId == Id);
+    }
+
+    private void ToggleEdit()
+    {
+        if (_editMode)
+        {
+            Snackbar.Add("Changes saved (simulated)", Severity.Success);
+        }
+        _editMode = !_editMode;
+    }
+}

@@ -1,0 +1,48 @@
+@page "/engagements"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject EngagementService EngagementService
+
+<PageTitle>Engagements</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Engagements</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<EngagementDto>>>(ServerReload))"
+          Hover="true" @ref="_table" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Active Engagements</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">New Engagement</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Ref</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Ref">@context.EngagementRef</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Color="Color.Info" Size="Size.Small">@context.EngagementStatus</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<EngagementDto> _table = null!;
+
+    private async Task<TableData<EngagementDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        var result = await EngagementService.GetEngagementsAsync(state.Page * state.PageSize, state.PageSize);
+        return new TableData<EngagementDto> { TotalItems = result.TotalCount, Items = result.Items };
+    }
+}
