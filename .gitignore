@@ -581,6 +581,8 @@ sync.ffs_db
 **/[Tt]emp/*
 **/[Tt]estResults/*
 **/[Tt]estResults.xml
+**/.localpilot/*
+**/.myollamaenhancer/*
 *.db
 *.db-wal
 *.db-shm
