@@ -8,7 +8,6 @@ using LocalCRM.API.GraphQL.Common;
 namespace LocalCRM.API.GraphQL.Mutations;
 
 [Authorize]
-[ExtendObjectType("Mutation")]
 public class CompanyMutations
 {
     public async Task<CompanyDto> CreateCompany(CreateCompanyCommand command, [Service] IMediator mediator)

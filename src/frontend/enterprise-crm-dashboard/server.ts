@@ -735,7 +735,7 @@ async function startServer() {
     try {
       const { id, name, industry, tier, location } = req.body;
       db.prepare("INSERT OR REPLACE INTO entities (id, name, industry, tier, location) VALUES (?, ?, ?, ?, ?)").run(id, name, industry, tier, location);
-      
+
       const userName = req.headers["x-user-name"] || "System Operator";
       addNotification(
         req,
@@ -757,7 +757,7 @@ async function startServer() {
     try {
       const { name, industry, tier, location } = req.body;
       db.prepare("UPDATE entities SET name = ?, industry = ?, tier = ?, location = ? WHERE id = ?").run(name, industry, tier, location, req.params.id);
-      
+
       const userName = req.headers["x-user-name"] || "System Operator";
       addNotification(
         req,
@@ -779,7 +779,7 @@ async function startServer() {
     try {
       const ent = db.prepare("SELECT * FROM entities WHERE id = ?").get(req.params.id) as any;
       db.prepare("DELETE FROM entities WHERE id = ?").run(req.params.id);
-      
+
       if (ent) {
         const userName = req.headers["x-user-name"] || "System Operator";
         addNotification(
@@ -950,7 +950,7 @@ async function startServer() {
       const userRole = (req.headers["x-user-role"] as string) || "";
 
       const rows = db.prepare(`
-        SELECT n.*, 
+        SELECT n.*,
                CASE WHEN nr.notificationId IS NOT NULL THEN 1 ELSE 0 END as isRead
         FROM notifications n
         LEFT JOIN notification_reads nr ON n.id = nr.notificationId AND nr.userEmail = ?

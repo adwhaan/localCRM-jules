@@ -411,7 +411,7 @@ export default function App() {
   const [selectedTagToLink, setSelectedTagToLink] = useState("");
   const [newTagName, setNewTagName] = useState("");
   const [newTagColor, setNewTagColor] = useState<CustomTag["color"]>("blue");
-  
+
   const [newNoteContent, setNewNoteContent] = useState("");
   const [newDocTitle, setNewDocTitle] = useState("");
   const [newDocType, setNewDocType] = useState<Document["fileType"]>("PDF");
@@ -583,12 +583,12 @@ export default function App() {
     return interactions.filter((item) => {
       if (item.status !== "SCHEDULED" && item.status !== "BLOCKED") return false;
       if (!item.date) return false;
-      
+
       const targetDate = new Date(item.date);
       // item.date is typically formatted as YYYY-MM-DD
       const diffTime = targetDate.getTime() - sysDate.getTime();
       const diffHours = diffTime / (1000 * 60 * 60);
-      
+
       // within 24 hours of system date (including past today/overdue and coming up tomorrow)
       return diffHours >= -24 && diffHours <= 24;
     });
@@ -708,12 +708,12 @@ export default function App() {
   // Compute additional metrics for summary insights
   const auditSystemMetrics = useMemo(() => {
     if (auditTargetLogs.length === 0) return { peakHour: "N/A", deletePercent: "0%", adminActionPercent: "0%" };
-    
+
     // Peak hour calculation
     const hourCounts: Record<number, number> = {};
     let peakHr = 0;
     let maxCount = 0;
-    
+
     // Action breakdown
     let totalActions = 0;
     let deleteActions = 0;
@@ -751,13 +751,13 @@ export default function App() {
     return auditLogs.filter((log) => {
       // Filter by dynamic vault class/target type
       if (auditTargetFilter !== "ALL" && log.targetType !== auditTargetFilter) return false;
-      
+
       // Filter by specific/range actions
       if (auditActionFilter !== "ALL") {
         if (auditActionFilter === "BATCH" && (!log.actionType || !log.actionType.startsWith("BATCH"))) return false;
         if (auditActionFilter !== "BATCH" && log.actionType !== auditActionFilter) return false;
       }
-      
+
       // Filter by loose query matching
       if (auditTextSearch.trim()) {
         const q = auditTextSearch.toLowerCase();
@@ -1039,7 +1039,7 @@ export default function App() {
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws?email=${encodeURIComponent(session.email)}&role=${encodeURIComponent(session.role)}`;
-    
+
     let ws: WebSocket;
     let reconnectTimer: any;
 
@@ -1080,7 +1080,7 @@ export default function App() {
 
     return () => {
       if (ws) {
-        ws.onclose = () => {}; 
+        ws.onclose = () => {};
         ws.close();
       }
       clearTimeout(reconnectTimer);
@@ -1567,7 +1567,7 @@ export default function App() {
     const newTag: CustomTag = { id: tagId, name: newTagName.trim(), color: newTagColor };
     setTags((prev) => [...prev, newTag]);
     syncToServer("/api/tags", "POST", newTag);
-    
+
     const updated = {
       ...selectedItem.data,
       tagIds: [...(selectedItem.data.tagIds || []), tagId]
@@ -1890,7 +1890,7 @@ export default function App() {
 
   return (
     <div id="enterprise-crm-workspace" className="min-h-screen bg-slate-50 flex text-slate-800 antialiased font-sans">
-      
+
       {/* Dynamic Notifications Toasts */}
       <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm pointer-events-none">
         {toasts.map((t) => (
@@ -2049,7 +2049,7 @@ export default function App() {
 
       {/* MAIN CONTENT WRAPPER */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        
+
         {/* HEADER */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
@@ -2072,8 +2072,8 @@ export default function App() {
 
           <div className="flex items-center gap-4 text-xs">
             <div className="relative">
-              <button 
-                onClick={() => setIsNotificationOpen(!isNotificationOpen)} 
+              <button
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className="p-2 text-slate-400 hover:text-slate-600 relative hover:bg-slate-50 rounded-lg transition-colors duration-200"
                 id="notification-bell-btn"
               >
@@ -2092,11 +2092,11 @@ export default function App() {
                     <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center font-bold">
                       <span className="text-slate-700">Real-Time Event Feed ({allNotifications.filter((n) => !n.isRead).length} critical)</span>
                       {allNotifications.filter((n) => !n.isRead).length > 0 && (
-                        <button 
+                        <button
                           onClick={() => {
                             markAllNotificationsAsRead();
                             markAllVirtualNotifsAsRead(virtualNotifications.map((v) => v.id));
-                          }} 
+                          }}
                           className="text-blue-600 hover:text-blue-800 hover:underline text-[10px] transition-colors font-bold cursor-pointer"
                         >
                           Mark all as read
@@ -2111,8 +2111,8 @@ export default function App() {
                         </div>
                       ) : (
                         allNotifications.map((notif) => (
-                          <div 
-                            key={notif.id} 
+                          <div
+                            key={notif.id}
                             className={`px-4 py-3 hover:bg-slate-50/50 flex items-start justify-between gap-3 transition duration-150 ${
                               !notif.isRead ? "bg-blue-50/20" : ""
                             }`}
@@ -2137,7 +2137,7 @@ export default function App() {
                               </div>
                             </div>
                             {!notif.isRead && (
-                              <button 
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (notif.id.startsWith("notif-impending-")) {
@@ -2145,7 +2145,7 @@ export default function App() {
                                   } else {
                                     markNotificationAsRead(notif.id);
                                   }
-                                }} 
+                                }}
                                 title="Mark as read"
                                 className="p-1 hover:bg-emerald-50 text-emerald-600 rounded shrink-0 self-center transition-all cursor-pointer"
                               >
@@ -2179,11 +2179,11 @@ export default function App() {
 
         {/* WORKSPACE TARGET PAGES */}
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
-          
+
           {/* TAB 1: EXECUTIVE DASHBOARD CONTAINER (NO CHARTS, DYNAMIC INTERACTIONS FEED) */}
           {activeTab === "dashboard" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              
+
               {/* Impending / Due Soon Alerts Notification Banner */}
               {impendingInteractions.length > 0 && (
                 <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-xl flex items-start gap-3 shadow-sm text-xs leading-relaxed animate-in slide-in-from-top-4 duration-300">
@@ -2200,8 +2200,8 @@ export default function App() {
                     </p>
                     <div className="flex flex-wrap gap-2 pt-1 font-mono">
                       {impendingInteractions.map((item) => (
-                        <div 
-                          key={item.id} 
+                        <div
+                          key={item.id}
                           onClick={() => setSelectedItem({ dataType: "interaction", data: item })}
                           className="bg-white hover:bg-slate-50 border border-amber-200/80 px-2 py-1 rounded-md text-[10px] text-slate-700 font-semibold cursor-pointer shadow-xs transition hover:scale-102 flex items-center gap-1.5"
                         >
@@ -2215,7 +2215,7 @@ export default function App() {
                   </div>
                 </div>
               )}
-              
+
               {/* Dynamic KPI Rows */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
                 <div onClick={() => setActiveTab("interactions")} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 hover:-translate-y-0.5 transition duration-300">
@@ -2313,7 +2313,7 @@ export default function App() {
 
               {/* TWO COLUMN ECOSYSTEM OVERVIEW (NO CHARTS) */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
+
                 {/* Timeline activity list */}
                 <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[450px]">
                   <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/40">
@@ -2322,7 +2322,7 @@ export default function App() {
                       <p className="text-[10px] text-slate-400 mt-0.5">Continuous corporate activity logs and linked attributes stream</p>
                     </div>
                   </div>
-                  
+
                   <div className="p-6 space-y-6 overflow-y-auto max-h-[450px] divide-y divide-slate-100">
                     {interactions.map((item) => {
                       const intNotes = notes.filter((n) => n.linkedToType === "interaction" && n.linkedToId === item.id);
@@ -2383,12 +2383,12 @@ export default function App() {
 
                 {/* Right widgets: Tags index & Quick document links */}
                 <div className="lg:col-span-1 space-y-6">
-                  
+
                   {/* Active Tags Widget */}
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                     <h3 className="font-bold text-slate-900 text-sm tracking-tight mb-1">Ecosystem Tag Directory</h3>
                     <p className="text-[10px] text-slate-400 mb-4">Click index tag to filter search queries instantly</p>
-                    
+
                     <div className="flex flex-wrap gap-2">
                       {tags.map((t) => {
                         const occurrences = interactions.filter((i) => i.tagIds?.includes(t.id)).length;
@@ -2410,7 +2410,7 @@ export default function App() {
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                     <h3 className="font-bold text-slate-900 text-sm tracking-tight mb-1">Central Document Vault</h3>
                     <p className="text-[10px] text-slate-400 mb-4">Centralized secure link records index</p>
-                    
+
                     <div className="space-y-2 max-h-60 overflow-y-auto modal-scroll pr-1">
                       {documents.map((doc) => (
                         <div key={doc.id} className="p-3 bg-slate-50 border border-slate-100 hover:bg-slate-100 transition rounded-lg text-xs flex justify-between items-center">
@@ -2442,7 +2442,7 @@ export default function App() {
           {/* TAB 2: RICH KANBAN INTERACTIONS WORKSPACE */}
           {activeTab === "interactions" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              
+
               {/* Impending / Due Soon Alerts Notification Banner */}
               {impendingInteractions.length > 0 && (
                 <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-xl flex items-start gap-3 shadow-sm text-xs leading-relaxed animate-in slide-in-from-top-4 duration-300">
@@ -2459,8 +2459,8 @@ export default function App() {
                     </p>
                     <div className="flex flex-wrap gap-2 pt-1 font-mono">
                       {impendingInteractions.map((item) => (
-                        <div 
-                          key={item.id} 
+                        <div
+                          key={item.id}
                           onClick={() => setSelectedItem({ dataType: "interaction", data: item })}
                           className="bg-white hover:bg-slate-50 border border-amber-200/80 px-2 py-1 rounded-md text-[10px] text-slate-700 font-semibold cursor-pointer shadow-xs transition hover:scale-102 flex items-center gap-1.5"
                         >
@@ -2518,7 +2518,7 @@ export default function App() {
                       <p className="text-[10px] text-slate-400 font-medium">Refine alignment tasks by designated agents and temporal sequences</p>
                     </div>
                   </div>
-                  
+
                   {(interactionAssigneeFilter !== "ALL" || interactionTimeRangeFilter !== "ALL" || interactionStartDateFilter || interactionEndDateFilter) && (
                     <button
                       onClick={() => {
@@ -2649,7 +2649,7 @@ export default function App() {
 
               {interactionsViewMode === "kanban" ? (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-in fade-in duration-300">
-                  
+
                   {/* Column Generator */}
                   {(["IN PROGRESS", "SCHEDULED", "COMPLETED", "BLOCKED"] as Interaction["status"][]).map((status) => {
                     const items = filteredInteractions.filter((i) => i.status === status);
@@ -2684,8 +2684,8 @@ export default function App() {
                                   key={item.id}
                                   onClick={() => setSelectedItem({ dataType: "interaction", data: item })}
                                   className={`p-3.5 border rounded-lg cursor-pointer shadow-sm transition-all duration-250 ${
-                                    isSelected 
-                                      ? "bg-blue-50/50 border-blue-400 ring-2 ring-blue-100/50 scale-[0.99] shadow-inner" 
+                                    isSelected
+                                      ? "bg-blue-50/50 border-blue-400 ring-2 ring-blue-100/50 scale-[0.99] shadow-inner"
                                       : isImpending
                                         ? "bg-amber-50/30 border-amber-300 ring-1 ring-amber-100/40 hover:border-amber-400"
                                         : `bg-white hover:border-slate-400 ${cardStatus.border}`
@@ -2858,7 +2858,7 @@ export default function App() {
                             >
                               <ChevronLeft className="w-4 h-4" />
                             </button>
-                            
+
                             <button
                               onClick={() => {
                                 setCalendarYear(2026);
@@ -2914,7 +2914,7 @@ export default function App() {
                             {allCalendarDays.map((day, cellIndex) => {
                               const isCurrentMonth = day.monthType === "current";
                               const isToday = day.dayNum === 7 && day.month === 5 && day.year === 2026; // June 7, 2026 from local metadata
-                              
+
                               // Format date as YYYY-MM-DD
                               const dateStr = `${day.year}-${String(day.month + 1).padStart(2, "0")}-${String(day.dayNum).padStart(2, "0")}`;
                               const dayInteractions = filteredInteractions.filter(i => i.date === dateStr);
@@ -2923,8 +2923,8 @@ export default function App() {
                                 <div
                                   key={`${day.year}-${day.month}-${day.dayNum}-${cellIndex}`}
                                   className={`min-h-[115px] p-2 rounded-lg border transition-all flex flex-col justify-between overflow-visible relative ${
-                                    isCurrentMonth 
-                                      ? isToday 
+                                    isCurrentMonth
+                                      ? isToday
                                         ? "bg-blue-50/50 border-blue-400 ring-2 ring-blue-100/40 shadow-inner"
                                         : "bg-white border-slate-200/70 hover:bg-slate-50/60"
                                       : "bg-slate-50/70 text-slate-350 border-slate-200/40 opacity-55"
@@ -2933,8 +2933,8 @@ export default function App() {
                                   {/* Cell Date Header and indicator */}
                                   <div className="flex items-center justify-between mb-1.5 select-none overflow-visible">
                                     <span className={`text-[10.5px] font-black font-mono leading-none w-5 h-5 flex items-center justify-center rounded-full ${
-                                      isToday 
-                                        ? "bg-blue-600 text-white font-black" 
+                                      isToday
+                                        ? "bg-blue-600 text-white font-black"
                                         : isCurrentMonth
                                           ? "text-slate-800"
                                           : "text-slate-400 font-semibold"
@@ -2981,8 +2981,8 @@ export default function App() {
                                         >
                                           {/* Item Pill */}
                                           <div className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold cursor-pointer border flex items-center justify-between gap-1 transition-all hover:scale-[1.02] shadow-[0_1px_2px_rgba(0,0,0,0.03)] select-none ${
-                                            isSelected 
-                                              ? "bg-blue-100 border-blue-400 text-blue-800" 
+                                            isSelected
+                                              ? "bg-blue-100 border-blue-400 text-blue-800"
                                               : `${cardStatus.bg} ${cardStatus.border} hover:border-slate-450`
                                           }`}>
                                             <span className="truncate flex-1 leading-snug">{item.subject}</span>
@@ -3145,7 +3145,7 @@ export default function App() {
                   const initialName = con.name.split(" ").map((n) => n[0]).join("").slice(0, 2);
                   const conNotes = notes.filter((n) => n.linkedToType === "contact" && n.linkedToId === con.id);
                   const conDocs = documents.filter((d) => d.linkedToType === "contact" && d.linkedToId === con.id);
-                  const linkedEntity = entities.find((ent) => 
+                  const linkedEntity = entities.find((ent) =>
                     ent.name.toLowerCase() === con.company.toLowerCase() ||
                     ent.name.toLowerCase().includes(con.company.toLowerCase()) ||
                     con.company.toLowerCase().includes(ent.name.toLowerCase())
@@ -3157,8 +3157,8 @@ export default function App() {
                       key={con.id}
                       onClick={() => setSelectedItem({ dataType: "contact", data: con })}
                       className={`border rounded-xl p-5 cursor-pointer shadow-sm transition-all duration-250 flex flex-col justify-between ${
-                        isSelected 
-                          ? "bg-emerald-50/50 border-emerald-400 ring-2 ring-emerald-100/50 scale-[0.99] shadow-inner" 
+                        isSelected
+                          ? "bg-emerald-50/50 border-emerald-400 ring-2 ring-emerald-100/50 scale-[0.99] shadow-inner"
                           : "bg-white border-slate-200 hover:border-emerald-400"
                       }`}
                     >
@@ -3424,7 +3424,7 @@ export default function App() {
                       isMain: true
                     });
                   }
-                  
+
                   // Mid-month marker for higher detail in Monthly zoom level
                   if (timelineZoom === "Monthly") {
                     const midDate = new Date(currDate.getFullYear(), currDate.getMonth(), 15);
@@ -3532,12 +3532,12 @@ export default function App() {
                     <div className="relative border border-slate-800/80 bg-slate-955 rounded-xl p-4 overflow-x-auto min-w-0">
                       {/* Grid representation */}
                       <div className="relative min-w-[700px] select-none py-1.5 overflow-visible">
-                        
+
                         {/* Month Vertical Grid Indicators & Labels */}
                         <div className="h-5 relative mb-4 border-b border-slate-850/60 overflow-visible text-slate-500 text-[9px] font-bold font-mono">
                           {monthMarkers.map((marker, idx) => (
-                            <div 
-                              key={idx} 
+                            <div
+                              key={idx}
                               className={`absolute -translate-x-1/2 flex flex-col items-center ${
                                 marker.isMain ? "text-slate-400" : "text-slate-600 font-medium"
                               }`}
@@ -3552,11 +3552,11 @@ export default function App() {
                         {/* Background Grid Vertical Lines */}
                         <div className="absolute inset-x-0 bottom-0 top-10 pointer-events-none overflow-visible z-0">
                           {monthMarkers.map((marker, idx) => (
-                            <div 
-                              key={`line-${idx}`} 
+                            <div
+                              key={`line-${idx}`}
                               className={`absolute w-px ${
-                                marker.isMain 
-                                  ? "bg-slate-900 border-l border-dashed border-slate-900/45" 
+                                marker.isMain
+                                  ? "bg-slate-900 border-l border-dashed border-slate-900/45"
                                   : "bg-slate-950/20 border-l border-dotted border-slate-950/20"
                               }`}
                               style={{ left: `${marker.percent}%`, top: 0, bottom: 0 }}
@@ -3566,7 +3566,7 @@ export default function App() {
 
                         {/* TODAY CURRENT DATE VERTICAL INDICATOR LINE */}
                         {todayPercent >= 0 && todayPercent <= 100 && (
-                          <div 
+                          <div
                             className="absolute bottom-0 top-6 w-0.5 pointer-events-none z-30 transition-all duration-350 overflow-visible"
                             style={{ left: `${todayPercent}%` }}
                           >
@@ -3633,16 +3633,16 @@ export default function App() {
                                 }[eng.status] || { barBg: "from-sky-500/10 to-sky-400/15 border-sky-500/30 text-sky-350", pinColor: "bg-sky-400" };
 
                                 return (
-                                  <div 
+                                  <div
                                     key={eng.id}
                                     className="relative group/timeline-row"
                                     onClick={() => setSelectedItem({ dataType: "engagement", data: eng })}
                                   >
                                     {/* Visual Bar Track */}
-                                    <div 
+                                    <div
                                       className="relative h-10 flex items-center bg-gradient-to-r shadow-inner group-hover/timeline-row:brightness-110 cursor-pointer transition-all duration-200"
-                                      style={{ 
-                                        left: `${leftPercent}%`, 
+                                      style={{
+                                        left: `${leftPercent}%`,
                                         width: `${widthPercent}%`,
                                       }}
                                     >
@@ -3651,10 +3651,10 @@ export default function App() {
                                       } ${
                                         isClippedRight ? "rounded-r-none border-r-dashed border-r-2" : "rounded-r-xl"
                                       } ${styleMap.barBg} relative overflow-hidden flex flex-col justify-center`}>
-                                        
+
                                         {/* Shaded elapsed indicator background inside the bar */}
                                         {elapsedPercent > 0 && (
-                                          <div 
+                                          <div
                                             className="absolute left-0 top-0 bottom-0 bg-slate-100/[0.04] transition-all duration-305 bg-gradient-to-r from-sky-500/5 to-sky-400/10"
                                             style={{ width: `${elapsedPercent}%` }}
                                           />
@@ -3714,8 +3714,8 @@ export default function App() {
                                               <span className="text-white">{elapsedPercent}% Elapsed</span>
                                             </div>
                                             <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-850">
-                                              <div 
-                                                className="h-full bg-gradient-to-r from-sky-500 to-sky-400 rounded-full" 
+                                              <div
+                                                className="h-full bg-gradient-to-r from-sky-500 to-sky-400 rounded-full"
                                                 style={{ width: `${elapsedPercent}%` }}
                                               />
                                             </div>
@@ -3760,7 +3760,7 @@ export default function App() {
                 {engagements.map((eng) => {
                   const engNotes = notes.filter((n) => n.linkedToType === "engagement" && n.linkedToId === eng.id);
                   const engDocs = documents.filter((d) => d.linkedToType === "engagement" && d.linkedToId === eng.id);
-                  
+
                   const statusColors = {
                     "Active": "bg-emerald-50 text-emerald-700 border-emerald-100",
                     "Under Negotiation": "bg-amber-50 text-amber-700 border-amber-100",
@@ -3884,7 +3884,7 @@ export default function App() {
                                       <span className="text-emerald-400 font-extrabold">{budgetDetails.percent}% Reserve</span>
                                     </div>
                                     <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-850">
-                                      <div 
+                                      <div
                                         className={`h-full rounded-full transition-all duration-500 ${
                                           budgetDetails.percent > 50 ? 'bg-emerald-500' : 'bg-amber-500'
                                         }`}
@@ -4704,7 +4704,7 @@ export default function App() {
       {isSearchActive && (
         <div id="search-results-modal" className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-12">
           <div className="fixed inset-0" onClick={() => { setIsSearchActive(false); setSearchQuery(""); }} />
-          
+
           <div className="bg-white w-[600px] max-h-[500px] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 z-[60] animate-in zoom-in-95 duration-200">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
               <span className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase">
@@ -4766,7 +4766,7 @@ export default function App() {
       {isNewModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center z-[80] p-4">
           <div className="fixed inset-0" onClick={() => setIsNewModalOpen(false)} />
-          
+
           <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 z-[90] animate-in zoom-in-95 duration-200 text-xs">
             <div className="bg-slate-50 p-4 border-b border-slate-100 flex justify-between items-center font-bold text-slate-800">
               <span>Register New Workspace Coordinates</span>
@@ -4979,11 +4979,11 @@ export default function App() {
       {selectedItem && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] flex justify-end z-[80] animate-in fade-in duration-200">
           <div className="fixed inset-0" onClick={() => setSelectedItem(null)} />
-          
+
           <div className="bg-white w-[420px] h-full shadow-2xl border-l border-slate-200 z-[90] flex flex-col justify-between animate-in slide-in-from-right duration-200">
-            
+
             <div className="overflow-y-auto flex-1 text-xs">
-              
+
               {/* Header */}
               <div className="p-5 border-b border-slate-150 bg-slate-50/50 flex justify-between items-center text-slate-800">
                 <div>
@@ -5413,7 +5413,7 @@ export default function App() {
               >
                 <Trash2 className="w-3.5 h-3.5" /> Permanent Discard
               </button>
-              
+
               <div className="flex gap-2">
                 <button type="button" onClick={() => setSelectedItem(null)} className="px-3 py-2 hover:bg-slate-200 rounded-lg text-slate-500 font-bold">Cancel</button>
                 <button type="button" onClick={() => handleUpdateItem(selectedItem.dataType, selectedItem.data)} className="px-4 py-2 bg-slate-900 text-white rounded-lg font-bold shadow">Save Changes</button>
@@ -5464,7 +5464,7 @@ export default function App() {
                     {st}
                   </button>
                 ))}
-                
+
                 <div className="w-px h-6 bg-slate-800 mx-1 hidden md:block" />
 
                 <button
