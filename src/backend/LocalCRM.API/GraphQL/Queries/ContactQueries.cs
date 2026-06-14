@@ -7,7 +7,6 @@ using MediatR;
 namespace LocalCRM.API.GraphQL.Queries;
 
 [Authorize]
-[ExtendObjectType("Query")]
 public class ContactQueries
 {
     [UseFiltering]

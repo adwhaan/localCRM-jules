@@ -11,7 +11,6 @@ using HotChocolate.Authorization;
 namespace LocalCRM.API.GraphQL.Mutations;
 
 [Authorize]
-[ExtendObjectType("Mutation")]
 public class UserMutations
 {
     [Authorize(Roles = new[] { "Administrator" })]
@@ -68,7 +67,6 @@ public class AuthMutations
     }
 
     [Authorize]
-[ExtendObjectType("Mutation")]
     public async Task<MutationResult> Logout(string refreshToken, [Service] IAuthService authService)
     {
         await authService.RevokeTokenAsync(refreshToken);

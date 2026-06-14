@@ -9,3 +9,5 @@ public interface IAuthService
     Task<AuthResponse?> RefreshTokenAsync(string refreshToken);
     Task<bool> RevokeTokenAsync(string refreshToken);
 }
+
+public record AuthResponse(string AccessToken, string RefreshToken, UserDto User);

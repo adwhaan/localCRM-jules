@@ -10,7 +10,6 @@ using Tag = LocalCRM.Domain.Entities.Tag;
 namespace LocalCRM.API.GraphQL.Queries;
 
 [Authorize]
-[ExtendObjectType("Query")]
 public class RoleQueries
 {
     public async Task<List<ApplicationRole>> GetRoles([Service] IRepository<ApplicationRole> repository)
@@ -20,7 +19,6 @@ public class RoleQueries
 }
 
 [Authorize]
-[ExtendObjectType("Query")]
 public class PermissionQueries
 {
     public async Task<List<Permission>> GetPermissions([Service] IRepository<Permission> repository)
@@ -30,7 +28,6 @@ public class PermissionQueries
 }
 
 [Authorize]
-[ExtendObjectType("Query")]
 public class SettingQueries
 {
     public async Task<List<Setting>> GetSettings([Service] IRepository<Setting> repository)
@@ -45,7 +42,6 @@ public class SettingQueries
 }
 
 [Authorize]
-[ExtendObjectType("Query")]
 public class SystemQueries
 {
     public async Task<PagedResult<AuditLog>> GetAuditLogs(
