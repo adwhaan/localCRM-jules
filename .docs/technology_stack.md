@@ -10,7 +10,6 @@
 | | Web Framework | ASP.NET Core Web API | Latest Stable LTS | Exposing REST/GraphQL endpoints. |
 | | Documentation | Swagger (Swashbuckle) | 6.5.0 | Interactive API testing and discovery. |
 | | Data Access (ORM) | Entity Framework Core | Latest Stable LTS | Managing domain models and transactions (CRUD). |
-| | Data Access (Mapper) | Dapper | Latest Stable LTS | High-performance data read operations. |
 | | Database Engine | SQLite | Latest Stable | Local file-based relational database, no external DB installation required. |
 | **Backend Testing** | Unit Testing | xUnit | Latest Stable | Testing isolated service methods and domain logic. |
 | | Mocking | Moq | Latest Stable | Creating mock dependencies for unit testing. |
@@ -33,7 +32,6 @@
 | **API Host** | ASP.NET Core Web API | Latest Stable LTS | Hosts the GraphQL API endpoints. | Must handle multi-user context and authorization checks on every endpoint, using JWT Bearer tokens. |
 | **Database** | SQLite | Latest Stable | The persistent, local data store. | Must support the transactional and foreign key requirements defined in `data_dictionary.md`. |
 | **Data Access (Primary)** | Entity Framework Core | Latest Stable LTS | Used for complex domain model changes, transactions, and initial CRUD operations. | Must be used for implementing the audit logging service layer. |
-| **Data Access (Secondary)** | Dapper | Latest Stable LTS | Used for optimized, high-speed read queries (SELECT). | Reserved for read-heavy endpoints (e.g., `GET /companies`). |
 
 ### 2. Backend Testing Stack
 | Tool | Purpose | Usage Context | Requirement |
