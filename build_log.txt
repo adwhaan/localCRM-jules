@@ -1,0 +1,18 @@
+  Determining projects to restore...
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [/app/src/backend/LocalCRM.API/LocalCRM.API.csproj]
+  All projects are up-to-date for restore.
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+  LocalCRM.Domain -> /app/src/backend/LocalCRM.Domain/bin/Debug/net8.0/LocalCRM.Domain.dll
+  LocalCRM.Application -> /app/src/backend/LocalCRM.Application/bin/Debug/net8.0/LocalCRM.Application.dll
+  LocalCRM.Infrastructure -> /app/src/backend/LocalCRM.Infrastructure/bin/Debug/net8.0/LocalCRM.Infrastructure.dll
+/app/src/backend/LocalCRM.API/Program.cs(58,42): error CS1003: Syntax error, ',' expected [/app/src/backend/LocalCRM.API/LocalCRM.API.csproj]
+
+Build FAILED.
+
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [/app/src/backend/LocalCRM.API/LocalCRM.API.csproj]
+/app/src/backend/LocalCRM.Application/LocalCRM.Application.csproj : warning NU1903: Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+/app/src/backend/LocalCRM.API/Program.cs(58,42): error CS1003: Syntax error, ',' expected [/app/src/backend/LocalCRM.API/LocalCRM.API.csproj]
+    2 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.61

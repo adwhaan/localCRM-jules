@@ -1,0 +1,54 @@
+@page "/companies"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@inject CompanyService CompanyService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Companies</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Companies</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<CompanyDto>>>(ServerReload))"
+          Hover="true" @ref="_table" Elevation="2" OnRowClick="@((TableRowClickEventArgs<CompanyDto> e) => NavigateToDetails(e.Item!.CompanyId))">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Companies List</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">Add Company</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Ref</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>City</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Ref">@context.CompanyRef</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="City">@context.City</MudTd>
+        <MudTd DataLabel="Type">@context.CompanyType</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" OnClick="@(() => NavigateToDetails(context.CompanyId))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<CompanyDto> _table = null!;
+
+    private async Task<TableData<CompanyDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        var result = await CompanyService.GetCompaniesAsync(state.Page * state.PageSize, state.PageSize);
+        return new TableData<CompanyDto> { TotalItems = result.TotalCount, Items = result.Items };
+    }
+
+    private void NavigateToDetails(int id)
+    {
+        NavigationManager.NavigateTo($"/companies/{id}");
+    }
+}
