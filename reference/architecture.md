@@ -32,7 +32,6 @@ Optimistic concurrency uses `updated_at`.
 Rules:
 - client must send `updated_at` for update operations
 - REST mismatch returns `409 Conflict`
-- GraphQL mismatch returns application error code `concurrency_conflict`
 
 ### 3. Transactionality
 Any business action modifying multiple related records must be transactional.
@@ -58,21 +57,9 @@ Ordinary validation failures are not audited by default.
 ## ⚙️ III. API Architecture
 
 ## 1. API Standard
-The backend exposes both:
+The backend exposes:
 
-- **GraphQL**
 - **REST**
-
-Both are first-class APIs.
-
-### GraphQL supports:
-- reads
-- writes
-- restore
-- bulk operations
-- auth/session operations
-- administrative operations
-- dashboard and metrics queries
 
 ### REST supports:
 - reads
@@ -84,7 +71,7 @@ Both are first-class APIs.
 - dashboard and system metrics endpoints
 - auth/session endpoints
 
-The frontend may use either API style per use case.
+The frontend may use the REST API per use case.
 
 ---
 
@@ -142,44 +129,11 @@ The frontend may use either API style per use case.
 
 ---
 
-## 3. GraphQL Conventions
-
-### Endpoint
-- `/graphql`
-
-### Naming
-- type names: singular PascalCase
-- collection queries: plural camelCase
-- single-item queries: singular camelCase
-- mutations: `verbEntity`
-
-### Pagination
-Offset pagination with:
-- `items`
-- `totalCount`
-- `offset`
-- `limit`
-
-### Filters and Sorting
-Each entity has typed filter/sort inputs.
-
-### Deleted data
-Deleted data is exposed through separate queries such as:
-- `deletedCompanies`
-- `deletedContacts`
-
-### Mutations
-Create/update return full entity objects.  
-Delete/restore return shared `MutationResult`.
-
----
-
 ## 💻 IV. Backend Component Model
 
 ## 1. Layers
 - API Layer
   - REST controllers
-  - GraphQL resolvers
 - Application Layer
   - services
   - authorization
@@ -187,6 +141,7 @@ Delete/restore return shared `MutationResult`.
   - session management
 - Data Access Layer
   - EF Core for writes / transactions
+  - Dapper optionally for read-heavy queries
 - Infrastructure Layer
   - SQLite
   - migrations
@@ -236,15 +191,6 @@ Errors must use:
   "traceId": "..."
 }
 
-### GraphQL
-Application errors must populate extensions with:
-
-* `code`
-* `message`
-* `details`
-* `traceId`
-
----
 
 # `requirements/requirement_details.md`
 
