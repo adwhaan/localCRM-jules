@@ -37,7 +37,7 @@ public class EngagementsController : ApiControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await Mediator.Send(new SoftDeleteEngagementCommand(id));
+        await Mediator.Send(new SoftDeleteEngagementCommand(EngagementId: id));
         return NoContent();
     }
 

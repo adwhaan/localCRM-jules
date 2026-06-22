@@ -17,14 +17,14 @@
     <HeaderContent>
         <MudTh>ID</MudTh>
         <MudTh>Username</MudTh>
-        <MudTh>Email</MudTh>
+        <MudTh>Role</MudTh>
         <MudTh>Status</MudTh>
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="ID">@context.Id</MudTd>
+        <MudTd DataLabel="ID">@context.UserId</MudTd>
         <MudTd DataLabel="Username">@context.Username</MudTd>
-        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Role">@context.RoleName</MudTd>
         <MudTd DataLabel="Status">
             <MudChip T="string" Color="@(context.IsActive ? Color.Success : Color.Error)" Size="Size.Small">
                 @(context.IsActive ? "Active" : "Disabled")
@@ -32,8 +32,8 @@
         </MudTd>
         <MudTd DataLabel="Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Info" Size="Size.Small" />
-            <MudIconButton Icon="@Icons.Material.Filled.Block" Color="Color.Warning" Size="Size.Small" OnClick="@(() => DisableUser(context.Id))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteUser(context.Id))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Block" Color="Color.Warning" Size="Size.Small" OnClick="@(() => DisableUser(context.UserId))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteUser(context.UserId))" />
         </MudTd>
     </RowTemplate>
 </MudTable>

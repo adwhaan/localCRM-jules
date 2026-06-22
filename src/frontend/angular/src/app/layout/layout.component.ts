@@ -123,8 +123,8 @@ import { LucideAngularModule } from 'lucide-angular';
             </div>
             <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
               <div class="text-right hidden sm:block">
-                <p class="text-xs font-bold text-slate-800">{{ currentUser?.username }}</p>
-                <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Administrator</p>
+                <p class="text-xs font-bold text-slate-800">{{ currentUser?.user?.username }}</p>
+                <p class="text-[10px] text-slate-500 uppercase tracking-tighter">{{ currentUser?.user?.roleName }}</p>
               </div>
               <div class="w-8 h-8 rounded-full bg-primary-100 border border-primary-200 flex items-center justify-center text-primary-700 text-xs font-bold uppercase">
                 JD

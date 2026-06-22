@@ -30,7 +30,4 @@ public class AuditLog
     public DateTime PerformedAt { get; set; } = DateTime.UtcNow;
     public string PerformedBy { get; set; } = string.Empty;
     public string? Notes { get; set; }
-    
-    // New properties
-    public string? ClientIp { get; set; } // Adds client IP address for security auditing
 }

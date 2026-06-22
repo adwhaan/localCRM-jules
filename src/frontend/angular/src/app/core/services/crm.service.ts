@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PagedResult, Company, Contact, Engagement, Interaction, DashboardMetrics } from '../models/crm.models';
+import { PagedResult, Company, Contact, Engagement, Interaction, DashboardMetrics, User } from '../models/crm.models';
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +27,9 @@ export class CrmService {
 
   getInteractions(offset = 0, limit = 10): Observable<PagedResult<Interaction>> {
     return this.http.get<PagedResult<Interaction>>(`api/interactions?offset=${offset}&limit=${limit}`);
+  }
+
+  getUsers(offset = 0, limit = 10): Observable<PagedResult<User>> {
+    return this.http.get<PagedResult<User>>(`api/users?offset=${offset}&limit=${limit}`);
   }
 }

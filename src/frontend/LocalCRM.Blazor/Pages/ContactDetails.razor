@@ -39,6 +39,9 @@ else
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_contact.Phone" Label="Phone" ReadOnly="!_editMode" Variant="Variant.Outlined" />
                     </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudRating @bind-Value="_contact.Rating" ReadOnly="!_editMode" MaxValue="5" />
+                    </MudItem>
                 </MudGrid>
             </MudPaper>
         </MudItem>

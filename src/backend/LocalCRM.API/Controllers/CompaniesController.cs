@@ -52,7 +52,7 @@ public partial class CompaniesController : ApiControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await Mediator.Send(new SoftDeleteCompanyCommand(id));
+        await Mediator.Send(new SoftDeleteCompanyCommand(CompanyId: id));
         return NoContent();
     }
 

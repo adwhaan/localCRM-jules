@@ -37,7 +37,7 @@ public class InteractionsController : ApiControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await Mediator.Send(new SoftDeleteInteractionCommand(id));
+        await Mediator.Send(new SoftDeleteInteractionCommand(InteractionId: id));
         return NoContent();
     }
 

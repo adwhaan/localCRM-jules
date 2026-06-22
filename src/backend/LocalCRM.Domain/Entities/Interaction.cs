@@ -17,7 +17,4 @@ public class Interaction : BaseEntity
     public string? InteractionTags { get; set; }
     public bool IsTask { get; set; }
     public InteractionLink? InteractionLink { get; set; }
-
-    // New properties
-    public DateTime DurationInMinutes { get; set; } // Adds duration of the interaction for analysis
 }

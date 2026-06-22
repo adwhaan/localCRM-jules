@@ -37,7 +37,7 @@ public class ContactsController : ApiControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await Mediator.Send(new SoftDeleteContactCommand(id));
+        await Mediator.Send(new SoftDeleteContactCommand(ContactId: id));
         return NoContent();
     }
 

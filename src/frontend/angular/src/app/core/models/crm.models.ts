@@ -85,17 +85,14 @@ export interface RecentInteraction {
 }
 
 export interface User {
-    id: number;
+    userId: number;
     username: string;
-    email: string;
+    roleName: string;
     isActive: boolean;
-    roles: string[];
 }
 
 export interface AuthResponse {
     token: string;
     refreshToken: string;
-    username: string;
-    roles: string[];
-    mustChangePassword: boolean;
+    user: User;
 }
