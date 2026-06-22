@@ -1,0 +1,75 @@
+@page "/users"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@inject UserService UserService
+@inject ISnackbar Snackbar
+
+<PageTitle>User Management</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">User Management</MudText>
+
+<MudTable Items="@_users" Hover="true" Loading="@_loading" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">System Users</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialog">Add User</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>Username</MudTh>
+        <MudTh>Role</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID">@context.UserId</MudTd>
+        <MudTd DataLabel="Username">@context.Username</MudTd>
+        <MudTd DataLabel="Role">@context.RoleName</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Color="@(context.IsActive ? Color.Success : Color.Error)" Size="Size.Small">
+                @(context.IsActive ? "Active" : "Disabled")
+            </MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Info" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Block" Color="Color.Warning" Size="Size.Small" OnClick="@(() => DisableUser(context.UserId))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteUser(context.UserId))" />
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private List<UserDto> _users = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        _loading = true;
+        _users = await UserService.GetUsersAsync();
+        _loading = false;
+    }
+
+    private void OpenCreateDialog()
+    {
+        Snackbar.Add("Create user dialog opening...", Severity.Info);
+    }
+
+    private async Task DisableUser(int id)
+    {
+        await UserService.DisableUserAsync(id);
+        Snackbar.Add("User disabled", Severity.Success);
+        await LoadUsers();
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        await UserService.DeleteUserAsync(id);
+        Snackbar.Add("User deleted", Severity.Success);
+        await LoadUsers();
+    }
+}

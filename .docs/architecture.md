@@ -187,7 +187,6 @@ Delete/restore return shared `MutationResult`.
   - session management
 - Data Access Layer
   - EF Core for writes / transactions
-  - Dapper optionally for read-heavy queries
 - Infrastructure Layer
   - SQLite
   - migrations

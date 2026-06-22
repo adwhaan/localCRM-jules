@@ -1,0 +1,83 @@
+@page "/search"
+@using MudBlazor
+@using LocalCRM.Blazor.Models
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Search Results</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Search Results for "@Term"</MudText>
+
+@if (_results == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else if (!_results.Any())
+{
+    <MudAlert Severity="Severity.Info">No results found for "@Term".</MudAlert>
+}
+else
+{
+    <MudList T="SearchResultDto">
+        @foreach (var result in _results.OrderByDescending(r => r.EntityType == "Engagement"))
+        {
+            <MudListItem Icon="@GetIcon(result.EntityType)" OnClick="@(() => NavigateToResult(result))">
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.subtitle1">@result.Title</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@result.EntityType - @result.Subtitle</MudText>
+                </div>
+            </MudListItem>
+            <MudDivider />
+        }
+    </MudList>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Term { get; set; } = "";
+
+    private List<SearchResultDto>? _results;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Term))
+        {
+            _results = new List<SearchResultDto>();
+            return;
+        }
+
+        try
+        {
+            _results = await HttpClient.GetFromJsonAsync<List<SearchResultDto>>($"api/search?term={Uri.EscapeDataString(Term)}");
+        }
+        catch
+        {
+            _results = new List<SearchResultDto>();
+        }
+    }
+
+    private string GetIcon(string type) => type switch
+    {
+        "Engagement" => Icons.Material.Filled.Handshake,
+        "Company" => Icons.Material.Filled.Business,
+        "Contact" => Icons.Material.Filled.Person,
+        "Interaction" => Icons.Material.Filled.Chat,
+        "Note" => Icons.Material.Filled.Note,
+        "Document" => Icons.Material.Filled.Description,
+        _ => Icons.Material.Filled.Search
+    };
+
+    private void NavigateToResult(SearchResultDto result)
+    {
+        var path = result.EntityType.ToLower() switch
+        {
+            "company" => $"companies/{result.Id}",
+            "contact" => $"contacts/{result.Id}",
+            "engagement" => $"engagements/{result.Id}",
+            _ => null
+        };
+
+        if (path != null) NavigationManager.NavigateTo(path);
+    }
+}

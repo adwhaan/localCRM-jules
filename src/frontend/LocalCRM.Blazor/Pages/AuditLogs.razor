@@ -1,0 +1,63 @@
+@page "/audit"
+@using MudBlazor
+@using LocalCRM.Blazor.Services
+@using LocalCRM.Blazor.Models
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient HttpClient
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>Audit Logs</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Audit Logs</MudText>
+
+<MudTable ServerData="@(new Func<TableState, CancellationToken, Task<TableData<AuditLogDto>>>(ServerReload))"
+          Hover="true" Elevation="2">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">System Activity</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Timestamp</MudTh>
+        <MudTh>User</MudTh>
+        <MudTh>Action</MudTh>
+        <MudTh>Entity</MudTh>
+        <MudTh>ID</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Timestamp">@context.PerformedAt.ToString("g")</MudTd>
+        <MudTd DataLabel="User">@context.PerformedBy</MudTd>
+        <MudTd DataLabel="Action">
+            <MudChip T="string" Color="@GetActionColor(context.ActionType)" Size="Size.Small">@context.ActionType</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Entity">@context.EntityName</MudTd>
+        <MudTd DataLabel="ID">@context.EntityId</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private async Task<TableData<AuditLogDto>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
+        {
+            var result = await HttpClient.GetFromJsonAsync<PagedResult<AuditLogDto>>($"api/audit?offset={state.Page * state.PageSize}&limit={state.PageSize}");
+            return new TableData<AuditLogDto> { TotalItems = result?.TotalCount ?? 0, Items = result?.Items ?? new() };
+        }
+        catch
+        {
+            return new TableData<AuditLogDto> { TotalItems = 0, Items = new List<AuditLogDto>().AsEnumerable() };
+        }
+    }
+
+    private Color GetActionColor(string action) => action switch
+    {
+        "CREATE" => Color.Success,
+        "UPDATE" => Color.Info,
+        "DELETE" => Color.Error,
+        "SOFT_DELETE" => Color.Warning,
+        "RESTORE" => Color.Success,
+        _ => Color.Default
+    };
+}
